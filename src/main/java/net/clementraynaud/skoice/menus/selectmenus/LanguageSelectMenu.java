@@ -50,7 +50,7 @@ public class LanguageSelectMenu extends SelectMenu {
         if (Skoice.getPlugin().isBotReady()) {
             return SelectionMenu.create(Menu.LANGUAGE.name() + "_SELECTION")
                     .addOptions(options)
-                    .setDefaultValues(Collections.singleton(Skoice.getPlugin().getConfig().getString(Config.LANG_FIELD))).build();
+                    .setDefaultValues(Collections.singleton(Config.getFile().getString(Config.LANG_FIELD))).build();
         } else {
             return SelectionMenu.create(Menu.LANGUAGE.name() + "_SELECTION")
                     .setPlaceholder(DiscordLang.LANGUAGE_SELECT_MENU_PLACEHOLDER.toString())

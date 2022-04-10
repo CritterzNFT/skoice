@@ -30,10 +30,10 @@ public class GuildMessageDeleteListener extends ListenerAdapter {
 
     @Override
     public void onGuildMessageDelete(@NotNull GuildMessageDeleteEvent event) {
-        if (Skoice.getPlugin().getConfig().contains(Config.TEMP_FIELD)
-                && event.getMessageId().equals(Skoice.getPlugin().getConfig().getString(Config.TEMP_MESSAGE_ID_FIELD))) {
-            Skoice.getPlugin().getConfig().set(Config.TEMP_FIELD, null);
-            Skoice.getPlugin().saveConfig();
+        if (Config.getFile().contains(Config.TEMP_FIELD)
+                && event.getMessageId().equals(Config.getFile().getString(Config.TEMP_MESSAGE_ID_FIELD))) {
+            Config.getFile().set(Config.TEMP_FIELD, null);
+            Config.saveFile();
             ButtonClickListener.discordIDAxis.clear();
         }
     }

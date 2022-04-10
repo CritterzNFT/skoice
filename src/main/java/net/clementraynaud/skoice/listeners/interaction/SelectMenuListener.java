@@ -43,8 +43,8 @@ public class SelectMenuListener extends ListenerAdapter {
     public void onSelectionMenu(SelectionMenuEvent event) {
         Member member = event.getMember();
         if (member != null && member.hasPermission(Permission.MANAGE_SERVER)) {
-            if (Skoice.getPlugin().getConfig().contains(Config.TEMP_MESSAGE_ID_FIELD)
-                    && Skoice.getPlugin().getConfig().getString(Config.TEMP_MESSAGE_ID_FIELD).equals(event.getMessageId())
+            if (Config.getFile().contains(Config.TEMP_MESSAGE_ID_FIELD)
+                    && Config.getFile().getString(Config.TEMP_MESSAGE_ID_FIELD).equals(event.getMessageId())
                     && event.getSelectedOptions() != null) {
                 String componentID = event.getComponentId();
                 switch (componentID) {
@@ -63,8 +63,8 @@ public class SelectMenuListener extends ListenerAdapter {
                         }
                         break;
                     case "LANGUAGE_SELECTION":
-                        Skoice.getPlugin().getConfig().set(Config.LANG_FIELD, event.getSelectedOptions().get(0).getValue());
-                        Skoice.getPlugin().saveConfig();
+                        Config.getFile().set(Config.LANG_FIELD, event.getSelectedOptions().get(0).getValue());
+                        Config.saveFile();
                         Skoice.getPlugin().updateConfigurationStatus(false);
                         new Commands().register(event.getGuild());
                         event.editMessage(new Response().getMessage()).queue();
@@ -77,16 +77,16 @@ public class SelectMenuListener extends ListenerAdapter {
                                         .complete().getId();
                                 String lobbyID = guild.createVoiceChannel(DiscordLang.DEFAULT_LOBBY_NAME.toString(), event.getGuild().getCategoryById(categoryID))
                                         .complete().getId();
-                                Skoice.getPlugin().getConfig().set(Config.LOBBY_ID_FIELD, lobbyID);
-                                Skoice.getPlugin().saveConfig();
+                                Config.getFile().set(Config.LOBBY_ID_FIELD, lobbyID);
+                                Config.saveFile();
                                 Skoice.getPlugin().updateConfigurationStatus(false);
                             } else if ("REFRESH" .equals(event.getSelectedOptions().get(0).getValue())) {
                                 event.editMessage(new Response().getMessage()).queue();
                             } else {
                                 VoiceChannel lobby = guild.getVoiceChannelById(event.getSelectedOptions().get(0).getValue());
                                 if (lobby != null && lobby.getParent() != null) {
-                                    Skoice.getPlugin().getConfig().set(Config.LOBBY_ID_FIELD, event.getSelectedOptions().get(0).getValue());
-                                    Skoice.getPlugin().saveConfig();
+                                    Config.getFile().set(Config.LOBBY_ID_FIELD, event.getSelectedOptions().get(0).getValue());
+                                    Config.saveFile();
                                     Skoice.getPlugin().updateConfigurationStatus(false);
                                 }
                             }
@@ -95,15 +95,15 @@ public class SelectMenuListener extends ListenerAdapter {
                         break;
                     case "MODE_SELECTION":
                         if ("VANILLA_MODE" .equals(event.getSelectedOptions().get(0).getValue())) {
-                            Skoice.getPlugin().getConfig().set(Config.HORIZONTAL_RADIUS_FIELD, 80);
-                            Skoice.getPlugin().getConfig().set(Config.VERTICAL_RADIUS_FIELD, 40);
-                            Skoice.getPlugin().saveConfig();
+                            Config.getFile().set(Config.HORIZONTAL_RADIUS_FIELD, 80);
+                            Config.getFile().set(Config.VERTICAL_RADIUS_FIELD, 40);
+                            Config.saveFile();
                             Skoice.getPlugin().updateConfigurationStatus(false);
                             event.editMessage(new Response().getMessage()).queue();
                         } else if ("MINIGAME_MODE" .equals(event.getSelectedOptions().get(0).getValue())) {
-                            Skoice.getPlugin().getConfig().set(Config.HORIZONTAL_RADIUS_FIELD, 40);
-                            Skoice.getPlugin().getConfig().set(Config.VERTICAL_RADIUS_FIELD, 20);
-                            Skoice.getPlugin().saveConfig();
+                            Config.getFile().set(Config.HORIZONTAL_RADIUS_FIELD, 40);
+                            Config.getFile().set(Config.VERTICAL_RADIUS_FIELD, 20);
+                            Config.saveFile();
                             Skoice.getPlugin().updateConfigurationStatus(false);
                             event.editMessage(new Response().getMessage()).queue();
                         } else if ("CUSTOMIZE" .equals(event.getSelectedOptions().get(0).getValue())) {
@@ -113,20 +113,20 @@ public class SelectMenuListener extends ListenerAdapter {
                         break;
                     case "ACTION_BAR_ALERT":
                         if ("true" .equals(event.getSelectedOptions().get(0).getValue())) {
-                            Skoice.getPlugin().getConfig().set(Config.ACTION_BAR_ALERT_FIELD, true);
+                            Config.getFile().set(Config.ACTION_BAR_ALERT_FIELD, true);
                         } else if ("false" .equals(event.getSelectedOptions().get(0).getValue())) {
-                            Skoice.getPlugin().getConfig().set(Config.ACTION_BAR_ALERT_FIELD, false);
+                            Config.getFile().set(Config.ACTION_BAR_ALERT_FIELD, false);
                         }
-                        Skoice.getPlugin().saveConfig();
+                        Config.saveFile();
                         event.editMessage(new Response().getMessage()).queue();
                         break;
                     case "CHANNEL_VISIBILITY":
                         if ("true" .equals(event.getSelectedOptions().get(0).getValue())) {
-                            Skoice.getPlugin().getConfig().set(Config.CHANNEL_VISIBILITY_FIELD, true);
+                            Config.getFile().set(Config.CHANNEL_VISIBILITY_FIELD, true);
                         } else if ("false" .equals(event.getSelectedOptions().get(0).getValue())) {
-                            Skoice.getPlugin().getConfig().set(Config.CHANNEL_VISIBILITY_FIELD, false);
+                            Config.getFile().set(Config.CHANNEL_VISIBILITY_FIELD, false);
                         }
-                        Skoice.getPlugin().saveConfig();
+                        Config.saveFile();
                         event.editMessage(new Response().getMessage()).queue();
                         break;
                     default:

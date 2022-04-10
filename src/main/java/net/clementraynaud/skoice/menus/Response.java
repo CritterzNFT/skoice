@@ -41,10 +41,10 @@ public class Response {
     public Message getMessage() {
         if (!Skoice.getPlugin().isGuildUnique()) {
             return Menu.SERVER.getMessage();
-        } else if (!Skoice.getPlugin().getConfig().contains(Config.LOBBY_ID_FIELD)) {
+        } else if (!Config.getFile().contains(Config.LOBBY_ID_FIELD)) {
             return Menu.LOBBY.getMessage();
-        } else if (!Skoice.getPlugin().getConfig().contains(Config.HORIZONTAL_RADIUS_FIELD)
-                || !Skoice.getPlugin().getConfig().contains(Config.VERTICAL_RADIUS_FIELD)) {
+        } else if (!Config.getFile().contains(Config.HORIZONTAL_RADIUS_FIELD)
+                || !Config.getFile().contains(Config.VERTICAL_RADIUS_FIELD)) {
             return Menu.MODE.getMessage();
         } else {
             return Menu.CONFIGURATION.getMessage();
@@ -59,16 +59,16 @@ public class Response {
     }
 
     public Message getConfigurationMessage() {
-        if (Skoice.getPlugin().getConfig().contains(Config.TEMP_FIELD)) {
-            Guild guild = Bot.getJda().getGuildById(Skoice.getPlugin().getConfig().getString(Config.TEMP_GUILD_ID_FIELD));
+        if (Config.getFile().contains(Config.TEMP_FIELD)) {
+            Guild guild = Bot.getJda().getGuildById(Config.getFile().getString(Config.TEMP_GUILD_ID_FIELD));
             if (guild != null) {
-                TextChannel textChannel = guild.getTextChannelById(Skoice.getPlugin().getConfig().getString(Config.TEMP_TEXT_CHANNEL_ID_FIELD));
+                TextChannel textChannel = guild.getTextChannelById(Config.getFile().getString(Config.TEMP_TEXT_CHANNEL_ID_FIELD));
                 if (textChannel != null) {
                     try {
-                        return textChannel.retrieveMessageById(Skoice.getPlugin().getConfig().getString(Config.TEMP_MESSAGE_ID_FIELD)).complete();
+                        return textChannel.retrieveMessageById(Config.getFile().getString(Config.TEMP_MESSAGE_ID_FIELD)).complete();
                     } catch (ErrorResponseException e) {
-                        Skoice.getPlugin().getConfig().set(Config.TEMP_FIELD, null);
-                        Skoice.getPlugin().saveConfig();
+                        Config.getFile().set(Config.TEMP_FIELD, null);
+                        Config.saveFile();
                         ButtonClickListener.discordIDAxis.clear();
                     }
                 }
@@ -78,8 +78,8 @@ public class Response {
     }
 
     public void sendLobbyDeletedAlert(Guild guild) {
-        Skoice.getPlugin().getConfig().set(Config.LOBBY_ID_FIELD, null);
-        Skoice.getPlugin().saveConfig();
+        Config.getFile().set(Config.LOBBY_ID_FIELD, null);
+        Config.saveFile();
         Skoice.getPlugin().updateConfigurationStatus(false);
         User user = guild.retrieveAuditLogs().limit(1).type(ActionType.CHANNEL_DELETE).complete().get(0).getUser();
         if (user != null && !user.isBot()) {

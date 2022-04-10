@@ -87,7 +87,7 @@ public enum LoggerLang {
 
     @Override
     public String toString() {
-        String lang = Skoice.getPlugin().getConfig().getString(Config.LANG_FIELD);
+        String lang = Config.getFile().getString(Config.LANG_FIELD);
         return this.messages.getOrDefault(lang == null ? Lang.EN : Lang.valueOf(lang), this.messages.get(Lang.EN));
     }
 }

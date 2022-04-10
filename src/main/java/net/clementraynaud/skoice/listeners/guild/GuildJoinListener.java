@@ -30,7 +30,7 @@ public class GuildJoinListener extends ListenerAdapter {
     @Override
     public void onGuildJoin(@NotNull GuildJoinEvent event) {
         new Commands().register(event.getGuild());
-        Skoice.getBot().updateGuildUniquenessStatus();
+        Skoice.getPlugin().getBot().updateGuildUniquenessStatus();
         Skoice.getPlugin().updateConfigurationStatus(false);
     }
 }

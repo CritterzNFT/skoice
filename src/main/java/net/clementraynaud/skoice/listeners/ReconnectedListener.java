@@ -30,9 +30,9 @@ public class ReconnectedListener extends ListenerAdapter {
     @Override
     public void onReconnected(@NotNull ReconnectedEvent event) {
         new Response().deleteMessage();
-        Skoice.getBot().updateGuildUniquenessStatus();
-        Skoice.getBot().checkForValidLobby();
-        Skoice.getBot().checkForUnlinkedUsersInLobby();
+        Skoice.getPlugin().getBot().updateGuildUniquenessStatus();
+        Skoice.getPlugin().getBot().checkForValidLobby();
+        Skoice.getPlugin().getBot().checkForUnlinkedUsersInLobby();
         Skoice.getPlugin().updateConfigurationStatus(false);
     }
 }

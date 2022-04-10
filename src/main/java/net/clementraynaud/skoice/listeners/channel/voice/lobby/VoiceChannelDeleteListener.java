@@ -29,7 +29,7 @@ public class VoiceChannelDeleteListener extends ListenerAdapter {
 
     @Override
     public void onVoiceChannelDelete(VoiceChannelDeleteEvent event) {
-        if (event.getChannel().getId().equals(Skoice.getPlugin().getConfig().getString(Config.LOBBY_ID_FIELD))) {
+        if (event.getChannel().getId().equals(Config.getFile().getString(Config.LOBBY_ID_FIELD))) {
             new Response().sendLobbyDeletedAlert(event.getGuild());
         }
     }

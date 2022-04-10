@@ -93,7 +93,7 @@ public class Bot {
 
     public void connectBot(boolean startup, CommandSender sender) {
         if (Skoice.getPlugin().isTokenSet()) {
-            byte[] base64TokenBytes = Base64.getDecoder().decode(Skoice.getPlugin().getConfig().getString(Config.TOKEN_FIELD));
+            byte[] base64TokenBytes = Base64.getDecoder().decode(Config.getFile().getString(Config.TOKEN_FIELD));
             for (int i = 0; i < base64TokenBytes.length; i++) {
                 base64TokenBytes[i]--;
             }
@@ -109,8 +109,8 @@ public class Bot {
                     Skoice.getPlugin().getLogger().severe(LoggerLang.BOT_COULD_NOT_CONNECT_ERROR.toString());
                 } else {
                     sender.sendMessage(MinecraftLang.BOT_COULD_NOT_CONNECT.toString());
-                    Skoice.getPlugin().getConfig().set(Config.TOKEN_FIELD, null);
-                    Skoice.getPlugin().saveConfig();
+                    Config.getFile().set(Config.TOKEN_FIELD, null);
+                    Config.saveFile();
                 }
             } catch (IllegalStateException e) {
 
@@ -186,9 +186,9 @@ public class Bot {
     }
 
     public void checkForValidLobby() {
-        if (Config.getLobby() == null && Skoice.getPlugin().getConfig().contains(Config.LOBBY_ID_FIELD)) {
-            Skoice.getPlugin().getConfig().set(Config.LOBBY_ID_FIELD, null);
-            Skoice.getPlugin().saveConfig();
+        if (Config.getLobby() == null && Config.getFile().contains(Config.LOBBY_ID_FIELD)) {
+            Config.getFile().set(Config.LOBBY_ID_FIELD, null);
+            Config.saveFile();
         }
     }
 

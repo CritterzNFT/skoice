@@ -53,26 +53,27 @@ import java.util.Objects;
 
 public class Skoice extends JavaPlugin {
 
-    private static Skoice plugin;
-    private static Bot bot;
+    private Skoice plugin;
+    private Bot bot;
+    private Config config;
     private boolean isTokenSet;
     private boolean isBotReady;
     private boolean isGuildUnique;
 
-    public static Skoice getPlugin() {
-        return Skoice.plugin;
+    public Skoice getPlugin() {
+        return this.plugin;
     }
 
-    public static void setPlugin(Skoice plugin) {
-        Skoice.plugin = plugin;
+    private void setPlugin(Skoice plugin) {
+        this.plugin = plugin;
     }
 
-    public static Bot getBot() {
-        return Skoice.bot;
+    public Bot getBot() {
+        return this.bot;
     }
 
-    public static void setBot(Bot bot) {
-        Skoice.bot = bot;
+    public void setBot(Bot bot) {
+        this.bot = bot;
     }
 
     public boolean isTokenSet() {
@@ -98,13 +99,14 @@ public class Skoice extends JavaPlugin {
     @Override
     public void onEnable() {
         new Metrics(this, 11380);
-        Skoice.setPlugin(this);
+        this.setPlugin(this);
         this.getLogger().info(LoggerLang.PLUGIN_ENABLED_INFO.toString());
-        this.getConfig().options().copyDefaults(true);
-        this.saveConfig();
+        this.config = new Config(this, this.getConfig());
+        this.config.getFile().options().copyDefaults(true);
+        this.config.saveFile();
         new OutdatedConfig().update();
-        this.isTokenSet = this.getConfig().contains(Config.TOKEN_FIELD);
-        Skoice.setBot(new Bot());
+        this.isTokenSet = this.config.getFile().contains(Config.TOKEN_FIELD);
+        this.setBot(new Bot());
         SkoiceCommand skoiceCommand = new SkoiceCommand();
         this.getCommand("skoice").setExecutor(skoiceCommand);
         this.getCommand("skoice").setTabCompleter(skoiceCommand);
@@ -122,7 +124,7 @@ public class Skoice extends JavaPlugin {
 
     public void updateConfigurationStatus(boolean startup) {
         boolean wasBotReady = this.isBotReady;
-        if (!this.getConfig().contains(Config.TOKEN_FIELD)) {
+        if (!this.config.getFile().contains(Config.TOKEN_FIELD)) {
             this.isTokenSet = false;
             this.isBotReady = false;
             this.getLogger().warning(LoggerLang.NO_TOKEN_WARNING.toString());
@@ -131,11 +133,11 @@ public class Skoice extends JavaPlugin {
         } else if (!this.isGuildUnique()) {
             this.isBotReady = false;
             this.getLogger().warning(LoggerLang.MULTIPLE_GUILDS_WARNING.toString());
-        } else if (!this.getConfig().contains(Config.LOBBY_ID_FIELD)) {
+        } else if (!this.config.getFile().contains(Config.LOBBY_ID_FIELD)) {
             this.isBotReady = false;
             this.getLogger().warning(LoggerLang.NO_LOBBY_ID_WARNING.toString());
-        } else if (!this.getConfig().contains(Config.HORIZONTAL_RADIUS_FIELD)
-                || !this.getConfig().contains(Config.VERTICAL_RADIUS_FIELD)) {
+        } else if (!this.config.getFile().contains(Config.HORIZONTAL_RADIUS_FIELD)
+                || !this.config.getFile().contains(Config.VERTICAL_RADIUS_FIELD)) {
             this.isBotReady = false;
             this.getLogger().warning(LoggerLang.NO_RADIUS_WARNING.toString());
         } else {
@@ -162,7 +164,7 @@ public class Skoice extends JavaPlugin {
                 this.registerEligiblePlayerListeners();
                 Bot.getJda().addEventListener(new GuildVoiceJoinListener(), new GuildVoiceLeaveListener(), new GuildVoiceMoveListener(), new VoiceChannelDeleteListener());
             } else {
-                Bukkit.getPluginManager().registerEvents(new net.clementraynaud.skoice.listeners.player.PlayerJoinListener(), Skoice.plugin);
+                Bukkit.getPluginManager().registerEvents(new net.clementraynaud.skoice.listeners.player.PlayerJoinListener(), this.plugin);
                 if (Bot.getJda() != null) {
                     Menu.MODE.refreshFields();
                 }
@@ -185,7 +187,7 @@ public class Skoice extends JavaPlugin {
         } else if (wasBotReady && !this.isBotReady) {
             new Response().deleteMessage();
             this.unregisterEligiblePlayerListeners();
-            Bukkit.getPluginManager().registerEvents(new net.clementraynaud.skoice.listeners.player.PlayerJoinListener(), Skoice.plugin);
+            Bukkit.getPluginManager().registerEvents(new net.clementraynaud.skoice.listeners.player.PlayerJoinListener(), this.plugin);
             if (Bot.getJda() != null) {
                 Bot.getJda().removeEventListener(new GuildVoiceJoinListener(), new GuildVoiceLeaveListener(), new GuildVoiceMoveListener(), new VoiceChannelDeleteListener());
                 Menu.MODE.refreshFields();
@@ -195,10 +197,10 @@ public class Skoice extends JavaPlugin {
     }
 
     private void registerEligiblePlayerListeners() {
-        Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(), Skoice.plugin);
-        Bukkit.getPluginManager().registerEvents(new PlayerQuitListener(), Skoice.plugin);
-        Bukkit.getPluginManager().registerEvents(new PlayerMoveListener(), Skoice.plugin);
-        Bukkit.getPluginManager().registerEvents(new PlayerTeleportListener(), Skoice.plugin);
+        Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(), this.plugin);
+        Bukkit.getPluginManager().registerEvents(new PlayerQuitListener(), this.plugin);
+        Bukkit.getPluginManager().registerEvents(new PlayerMoveListener(), this.plugin);
+        Bukkit.getPluginManager().registerEvents(new PlayerTeleportListener(), this.plugin);
     }
 
     private void unregisterEligiblePlayerListeners() {

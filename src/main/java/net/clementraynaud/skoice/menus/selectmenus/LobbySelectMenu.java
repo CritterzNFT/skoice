@@ -71,7 +71,7 @@ public class LobbySelectMenu extends SelectMenu {
         if (Skoice.getPlugin().isBotReady()) {
             return SelectionMenu.create(Menu.LOBBY.name() + "_SELECTION")
                     .addOptions(options)
-                    .setDefaultValues(Collections.singleton(Skoice.getPlugin().getConfig().getString(Config.LOBBY_ID_FIELD))).build();
+                    .setDefaultValues(Collections.singleton(Config.getFile().getString(Config.LOBBY_ID_FIELD))).build();
         } else {
             return SelectionMenu.create(Menu.LOBBY.name() + "_SELECTION")
                     .setPlaceholder(DiscordLang.LOBBY_SELECT_MENU_PLACEHOLDER.toString())

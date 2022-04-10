@@ -44,8 +44,8 @@ public class ButtonClickListener extends ListenerAdapter {
     public void onButtonClick(ButtonClickEvent event) {
         Member member = event.getMember();
         if (member != null && member.hasPermission(Permission.MANAGE_SERVER)) {
-            if (Skoice.getPlugin().getConfig().contains(Config.TEMP_MESSAGE_ID_FIELD)
-                    && Skoice.getPlugin().getConfig().getString(Config.TEMP_MESSAGE_ID_FIELD).equals(event.getMessageId())
+            if (Config.getFile().contains(Config.TEMP_MESSAGE_ID_FIELD)
+                    && Config.getFile().getString(Config.TEMP_MESSAGE_ID_FIELD).equals(event.getMessageId())
                     && event.getButton() != null && event.getButton().getId() != null) {
                 String buttonID = event.getButton().getId();
                 if (buttonID.equals(Menu.CLOSE_BUTTON_ID)) {

@@ -45,7 +45,7 @@ public class OutdatedConfig {
             this.convertOldData("mainVoiceChannelID", Config.LOBBY_ID_FIELD);
             this.convertOldRadius();
             this.convertOldLinks();
-            Skoice.getPlugin().saveConfig();
+            Config.saveFile();
             try {
                 Files.delete(outdatedConfig.toPath());
             } catch (IOException ignored) {
@@ -56,7 +56,7 @@ public class OutdatedConfig {
     private void convertOldToken() {
         if (this.oldData.contains("token")
                 && !this.oldData.getString("token").isEmpty()
-                && !Skoice.getPlugin().getConfig().contains(Config.TOKEN_FIELD)) {
+                && !Config.getFile().contains(Config.TOKEN_FIELD)) {
             Config.setToken(this.oldData.getString("token"));
         }
     }
@@ -67,11 +67,11 @@ public class OutdatedConfig {
             this.convertOldData("distance.horizontalStrength", Config.HORIZONTAL_RADIUS_FIELD);
             this.convertOldData("distance.verticalStrength", Config.VERTICAL_RADIUS_FIELD);
         } else {
-            if (!Skoice.getPlugin().getConfig().contains(Config.HORIZONTAL_RADIUS_FIELD)) {
-                Skoice.getPlugin().getConfig().set(Config.HORIZONTAL_RADIUS_FIELD, 80);
+            if (!Config.getFile().contains(Config.HORIZONTAL_RADIUS_FIELD)) {
+                Config.getFile().set(Config.HORIZONTAL_RADIUS_FIELD, 80);
             }
-            if (!Skoice.getPlugin().getConfig().contains(Config.VERTICAL_RADIUS_FIELD)) {
-                Skoice.getPlugin().getConfig().set(Config.VERTICAL_RADIUS_FIELD, 40);
+            if (!Config.getFile().contains(Config.VERTICAL_RADIUS_FIELD)) {
+                Config.getFile().set(Config.VERTICAL_RADIUS_FIELD, 40);
             }
         }
     }
@@ -85,15 +85,15 @@ public class OutdatedConfig {
                 linkMap.put(iterator.next(), iterator.next());
             }
             linkMap.putAll(Config.getLinkMap());
-            Skoice.getPlugin().getConfig().set(Config.LINK_MAP_FIELD, linkMap);
+            Config.getFile().set(Config.LINK_MAP_FIELD, linkMap);
         }
     }
 
     private void convertOldData(String oldField, String newField) {
         if (this.oldData.contains(oldField)
                 && !this.oldData.getString(oldField).isEmpty()
-                && !Skoice.getPlugin().getConfig().contains(newField)) {
-            Skoice.getPlugin().getConfig().set(newField, this.oldData.get(oldField));
+                && !Config.getFile().contains(newField)) {
+            Config.getFile().set(newField, this.oldData.get(oldField));
         }
     }
 }

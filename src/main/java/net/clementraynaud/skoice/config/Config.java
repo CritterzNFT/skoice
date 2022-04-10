@@ -25,6 +25,7 @@ import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.VoiceChannel;
+import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.*;
 
@@ -43,13 +44,26 @@ public class Config {
     public static final String TEMP_TEXT_CHANNEL_ID_FIELD = Config.TEMP_FIELD + ".text-channel-id";
     public static final String TEMP_MESSAGE_ID_FIELD = Config.TEMP_FIELD + ".message-id";
 
-    private Config() {
+    private final Skoice plugin;
+    private final FileConfiguration file;
+
+    public Config(Skoice plugin, FileConfiguration file) {
+        this.plugin = plugin;
+        this.file = file;
     }
 
-    public static Map<String, String> getLinkMap() {
+    public FileConfiguration getFile() {
+        return this.file;
+    }
+
+    public void saveFile() {
+        this.plugin.saveConfig();
+    }
+
+    public Map<String, String> getLinkMap() {
         Map<String, String> castedLinkMap = new HashMap<>();
-        if (Skoice.getPlugin().getConfig().isSet(Config.LINK_MAP_FIELD)) {
-            Map<String, Object> linkMap = new HashMap<>(Skoice.getPlugin().getConfig().getConfigurationSection(Config.LINK_MAP_FIELD).getValues(false));
+        if (this.file.isSet(Config.LINK_MAP_FIELD)) {
+            Map<String, Object> linkMap = new HashMap<>(this.file.getConfigurationSection(Config.LINK_MAP_FIELD).getValues(false));
             for (Map.Entry<String, Object> entry : linkMap.entrySet()) {
                 castedLinkMap.put(entry.getKey(), entry.getValue().toString());
             }
@@ -57,98 +71,85 @@ public class Config {
         return castedLinkMap;
     }
 
-    public static String getKeyFromValue(Map<String, String> map, String value) {
+    public String getKeyFromValue(Map<String, String> map, String value) {
         for (Map.Entry<String, String> entry : map.entrySet()) {
             if (Objects.equals(value, entry.getValue())) {
                 return entry.getKey();
             }
         }
-
         return null;
     }
 
-    public static Member getMember(UUID minecraftID) {
-        String discordID = Config.getLinkMap().get(minecraftID);
-        Guild guild = Config.getGuild();
+    public Member getMember(UUID minecraftID) {
+        String discordID = this.getLinkMap().get(minecraftID);
+        Guild guild = this.getGuild();
         if (guild == null) {
             return null;
         }
         return discordID != null ? guild.getMemberById(discordID) : null;
     }
 
-    public static void setToken(String token) {
+    public void setToken(String token) {
         byte[] tokenBytes = token.getBytes();
         for (int i = 0; i < tokenBytes.length; i++) {
             tokenBytes[i]++;
         }
-        Skoice.getPlugin().getConfig().set(Config.TOKEN_FIELD, Base64.getEncoder().encodeToString(tokenBytes));
-        Skoice.getPlugin().saveConfig();
+        this.getFile().set(Config.TOKEN_FIELD, Base64.getEncoder().encodeToString(tokenBytes));
+        this.saveFile();
     }
 
-    public static VoiceChannel getLobby() {
+    public VoiceChannel getLobby() {
         if (Bot.getJda() == null) {
             return null;
         }
-        String lobbyID = Skoice.getPlugin().getConfig().getString(Config.LOBBY_ID_FIELD);
+        String lobbyID = this.file.getString(Config.LOBBY_ID_FIELD);
         if (lobbyID == null) {
             return null;
         }
         VoiceChannel lobby = Bot.getJda().getVoiceChannelById(lobbyID);
-        if (lobby == null) {
-            return null;
-        }
-        if (lobby.getParent() == null) {
-            return null;
-        }
-        return lobby;
+        return lobby != null && lobby.getParent() != null ? lobby : null;
     }
 
-    public static Category getCategory() {
+    public Category getCategory() {
         if (Bot.getJda() == null) {
             return null;
         }
-        VoiceChannel lobby = Config.getLobby();
-        if (lobby == null) {
-            return null;
-        }
-        return lobby.getParent();
+        VoiceChannel lobby = this.getLobby();
+        return lobby != null ? lobby.getParent() : null;
     }
 
-    public static Guild getGuild() {
-        VoiceChannel lobby = Config.getLobby();
-        if (lobby == null) {
-            return null;
-        }
-        return lobby.getGuild();
+    public Guild getGuild() {
+        VoiceChannel lobby = this.getLobby();
+        return lobby != null ? lobby.getGuild() : null;
     }
 
-    public static int getHorizontalRadius() {
-        return Skoice.getPlugin().getConfig().getInt(Config.HORIZONTAL_RADIUS_FIELD);
+    public int getHorizontalRadius() {
+        return this.file.getInt(Config.HORIZONTAL_RADIUS_FIELD);
     }
 
-    public static int getVerticalRadius() {
-        return Skoice.getPlugin().getConfig().getInt(Config.VERTICAL_RADIUS_FIELD);
+    public int getVerticalRadius() {
+        return this.file.getInt(Config.VERTICAL_RADIUS_FIELD);
     }
 
-    public static boolean getActionBarAlert() {
-        return Skoice.getPlugin().getConfig().getBoolean(Config.ACTION_BAR_ALERT_FIELD);
+    public boolean getActionBarAlert() {
+        return this.file.getBoolean(Config.ACTION_BAR_ALERT_FIELD);
     }
 
-    public static boolean getChannelVisibility() {
-        return Skoice.getPlugin().getConfig().getBoolean(Config.CHANNEL_VISIBILITY_FIELD);
+    public boolean getChannelVisibility() {
+        return this.file.getBoolean(Config.CHANNEL_VISIBILITY_FIELD);
     }
 
-    public static void linkUser(String minecraftID, String discordID) {
-        Map<String, String> linkMap = Config.getLinkMap();
+    public void linkUser(String minecraftID, String discordID) {
+        Map<String, String> linkMap = this.getLinkMap();
         linkMap.put(minecraftID, discordID);
-        Skoice.getPlugin().getConfig().set(Config.LINK_MAP_FIELD, linkMap);
-        Skoice.getPlugin().saveConfig();
+        this.file.set(Config.LINK_MAP_FIELD, linkMap);
+        this.saveFile();
     }
 
-    public static void unlinkUser(String minecraftID) {
-        Map<String, String> linkMap = Config.getLinkMap();
+    public void unlinkUser(String minecraftID) {
+        Map<String, String> linkMap = this.getLinkMap();
         linkMap.remove(minecraftID);
-        Skoice.getPlugin().getConfig().set(Config.LINK_MAP_FIELD, linkMap);
-        Skoice.getPlugin().saveConfig();
+        this.file.set(Config.LINK_MAP_FIELD, linkMap);
+        this.saveFile();
     }
 }

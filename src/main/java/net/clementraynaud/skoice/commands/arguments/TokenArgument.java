@@ -47,7 +47,7 @@ public class TokenArgument extends Argument {
         Config.setToken(this.arg);
         Skoice.getPlugin().setTokenBoolean(true);
         if (Bot.getJda() == null) {
-            Skoice.getBot().connectBot(false, this.sender);
+            Skoice.getPlugin().getBot().connectBot(false, this.sender);
         } else {
             this.sender.sendMessage(MinecraftLang.BOT_ALREADY_CONNECTED.toString());
         }

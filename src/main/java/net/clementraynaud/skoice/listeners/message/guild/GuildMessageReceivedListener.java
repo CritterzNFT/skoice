@@ -34,10 +34,10 @@ public class GuildMessageReceivedListener extends ListenerAdapter {
         String discordID = event.getAuthor().getId();
         if (discordID.equals(event.getJDA().getSelfUser().getId())) {
             if (!event.getMessage().isEphemeral()) {
-                Skoice.getPlugin().getConfig().set(Config.TEMP_GUILD_ID_FIELD, event.getGuild().getId());
-                Skoice.getPlugin().getConfig().set(Config.TEMP_TEXT_CHANNEL_ID_FIELD, event.getChannel().getId());
-                Skoice.getPlugin().getConfig().set(Config.TEMP_MESSAGE_ID_FIELD, event.getMessageId());
-                Skoice.getPlugin().saveConfig();
+                Config.getFile().set(Config.TEMP_GUILD_ID_FIELD, event.getGuild().getId());
+                Config.getFile().set(Config.TEMP_TEXT_CHANNEL_ID_FIELD, event.getChannel().getId());
+                Config.getFile().set(Config.TEMP_MESSAGE_ID_FIELD, event.getMessageId());
+                Config.saveFile();
             }
         } else if (ButtonClickListener.discordIDAxis.containsKey(event.getAuthor().getId())
                 && event.getMessage().getContentRaw().length() <= 4
@@ -45,8 +45,8 @@ public class GuildMessageReceivedListener extends ListenerAdapter {
             int value = Integer.parseInt(event.getMessage().getContentRaw());
             if (value >= 1 && value <= 1000) {
                 event.getMessage().delete().queue();
-                Skoice.getPlugin().getConfig().set(ButtonClickListener.discordIDAxis.get(event.getAuthor().getId()), value);
-                Skoice.getPlugin().saveConfig();
+                Config.getFile().set(ButtonClickListener.discordIDAxis.get(event.getAuthor().getId()), value);
+                Config.saveFile();
                 new Response().deleteMessage();
                 Menu.customizeRadius = false;
                 if (ButtonClickListener.discordIDAxis.get(event.getAuthor().getId()).equals(Config.HORIZONTAL_RADIUS_FIELD)) {

@@ -54,7 +54,7 @@ public class Network {
     public Network(Set<UUID> players) {
         this.players = players;
         Guild guild = Config.getGuild();
-        List<Permission> deniedPermissions = Skoice.getPlugin().getConfig().getBoolean(Config.CHANNEL_VISIBILITY_FIELD)
+        List<Permission> deniedPermissions = Config.getFile().getBoolean(Config.CHANNEL_VISIBILITY_FIELD)
                 ? Arrays.asList(Permission.VOICE_CONNECT, Permission.VOICE_MOVE_OTHERS)
                 : Arrays.asList(Permission.VIEW_CHANNEL, Permission.VOICE_MOVE_OTHERS);
         Config.getCategory().createVoiceChannel(UUID.randomUUID().toString())

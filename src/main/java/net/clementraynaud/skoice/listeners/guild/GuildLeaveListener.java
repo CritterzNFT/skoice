@@ -28,7 +28,7 @@ public class GuildLeaveListener extends ListenerAdapter {
 
     @Override
     public void onGuildLeave(@NotNull GuildLeaveEvent event) {
-        Skoice.getBot().updateGuildUniquenessStatus();
+        Skoice.getPlugin().getBot().updateGuildUniquenessStatus();
         Skoice.getPlugin().updateConfigurationStatus(false);
     }
 }
