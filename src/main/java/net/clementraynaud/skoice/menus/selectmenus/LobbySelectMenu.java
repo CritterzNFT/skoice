@@ -19,8 +19,6 @@
 
 package net.clementraynaud.skoice.menus.selectmenus;
 
-import net.clementraynaud.skoice.Skoice;
-import net.clementraynaud.skoice.bot.Bot;
 import net.clementraynaud.skoice.config.Config;
 import net.clementraynaud.skoice.menus.Menu;
 import net.clementraynaud.skoice.menus.MenuEmoji;
@@ -45,7 +43,7 @@ public class LobbySelectMenu extends SelectMenu {
 
     @Override
     public SelectionMenu get() {
-        List<VoiceChannel> voiceChannels = new ArrayList<>(Bot.getJda().getVoiceChannels());
+        List<VoiceChannel> voiceChannels = new ArrayList<>(super.bot.getJda().getVoiceChannels());
         List<Category> categories = new ArrayList<>();
         for (VoiceChannel voiceChannel : voiceChannels) {
             categories.add(voiceChannel.getParent());
@@ -68,10 +66,10 @@ public class LobbySelectMenu extends SelectMenu {
                     .withDescription(DiscordLang.TOO_MANY_OPTIONS_SELECT_OPTION_DESCRIPTION.toString())
                     .withEmoji(MenuEmoji.WARNING.getEmojiFromUnicode()));
         }
-        if (Skoice.getPlugin().isBotReady()) {
+        if (super.plugin.isBotReady()) {
             return SelectionMenu.create(Menu.LOBBY.name() + "_SELECTION")
                     .addOptions(options)
-                    .setDefaultValues(Collections.singleton(Config.getFile().getString(Config.LOBBY_ID_FIELD))).build();
+                    .setDefaultValues(Collections.singleton(super.config.getFile().getString(Config.LOBBY_ID_FIELD))).build();
         } else {
             return SelectionMenu.create(Menu.LOBBY.name() + "_SELECTION")
                     .setPlaceholder(DiscordLang.LOBBY_SELECT_MENU_PLACEHOLDER.toString())

@@ -36,6 +36,14 @@ public class LinkCommand extends ListenerAdapter {
 
     private static final Map<String, String> discordIDCode = new HashMap<>();
 
+    private final Skoice plugin;
+    private final Config config;
+
+    public LinkCommand(Skoice plugin, Config config) {
+        this.plugin = plugin;
+        this.config = config;
+    }
+
     public static Map<String, String> getDiscordIDCode() {
         return LinkCommand.discordIDCode;
     }
@@ -47,7 +55,7 @@ public class LinkCommand extends ListenerAdapter {
     @Override
     public void onSlashCommand(SlashCommandEvent event) {
         if ("link" .equals(event.getName())) {
-            if (!Skoice.getPlugin().isBotReady()) {
+            if (!this.plugin.isBotReady()) {
                 EmbedBuilder embed = new EmbedBuilder().setTitle(MenuEmoji.GEAR + DiscordLang.CONFIGURATION_EMBED_TITLE.toString());
                 event.replyEmbeds(embed.addField(MenuEmoji.WARNING + DiscordLang.INCOMPLETE_CONFIGURATION_FIELD_TITLE.toString(),
                                         DiscordLang.INCOMPLETE_CONFIGURATION_FIELD_DESCRIPTION.toString(), false)
@@ -56,7 +64,7 @@ public class LinkCommand extends ListenerAdapter {
                 return;
             }
             EmbedBuilder embed = new EmbedBuilder().setTitle(MenuEmoji.LINK + DiscordLang.LINKING_PROCESS_EMBED_TITLE.toString());
-            if (Config.getLinkMap().containsValue(event.getUser().getId())) {
+            if (this.config.getLinkMap().containsValue(event.getUser().getId())) {
                 event.replyEmbeds(embed.addField(MenuEmoji.WARNING + DiscordLang.ACCOUNT_ALREADY_LINKED_FIELD_TITLE.toString(),
                                         DiscordLang.ACCOUNT_ALREADY_LINKED_FIELD_DESCRIPTION.toString(), false)
                                 .setColor(Color.RED).build())

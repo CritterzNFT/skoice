@@ -20,6 +20,8 @@
 package net.clementraynaud.skoice.listeners;
 
 import net.clementraynaud.skoice.Skoice;
+import net.clementraynaud.skoice.bot.Bot;
+import net.clementraynaud.skoice.config.Config;
 import net.clementraynaud.skoice.menus.Response;
 import net.dv8tion.jda.api.events.ReconnectedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -27,12 +29,22 @@ import org.jetbrains.annotations.NotNull;
 
 public class ReconnectedListener extends ListenerAdapter {
 
+    private final Skoice plugin;
+    private final Config config;
+    private final Bot bot;
+
+    public ReconnectedListener(Skoice plugin, Config config, Bot bot) {
+        this.plugin = plugin;
+        this.config = config;
+        this.bot = bot;
+    }
+
     @Override
     public void onReconnected(@NotNull ReconnectedEvent event) {
-        new Response().deleteMessage();
-        Skoice.getPlugin().getBot().updateGuildUniquenessStatus();
-        Skoice.getPlugin().getBot().checkForValidLobby();
-        Skoice.getPlugin().getBot().checkForUnlinkedUsersInLobby();
-        Skoice.getPlugin().updateConfigurationStatus(false);
+        new Response(this.plugin, this.config, this.bot).deleteMessage();
+        this.bot.updateGuildUniquenessStatus();
+        this.bot.checkForValidLobby();
+        this.bot.checkForUnlinkedUsersInLobby();
+        this.plugin.updateConfigurationStatus(false);
     }
 }

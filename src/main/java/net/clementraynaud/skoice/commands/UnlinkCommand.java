@@ -36,18 +36,24 @@ import java.util.UUID;
 
 public class UnlinkCommand extends ListenerAdapter {
 
+    private final Config config;
+
+    public UnlinkCommand(Config config) {
+        this.config = config;
+    }
+
     @Override
     public void onSlashCommand(SlashCommandEvent event) {
         if ("unlink" .equals(event.getName())) {
             EmbedBuilder embed = new EmbedBuilder().setTitle(MenuEmoji.LINK + DiscordLang.LINKING_PROCESS_EMBED_TITLE.toString());
-            String minecraftID = Config.getKeyFromValue(Config.getLinkMap(), event.getUser().getId());
+            String minecraftID = this.config.getKeyFromValue(this.config.getLinkMap(), event.getUser().getId());
             if (minecraftID == null) {
                 event.replyEmbeds(embed.addField(MenuEmoji.WARNING + DiscordLang.ACCOUNT_NOT_LINKED_FIELD_TITLE.toString(),
                                         DiscordLang.ACCOUNT_NOT_LINKED_FIELD_DESCRIPTION.toString(), false)
                                 .setColor(Color.RED).build())
                         .setEphemeral(true).queue();
             } else {
-                Config.unlinkUser(minecraftID);
+                this.config.unlinkUser(minecraftID);
                 event.replyEmbeds(embed.addField(MenuEmoji.HEAVY_CHECK_MARK + DiscordLang.ACCOUNT_UNLINKED_FIELD_TITLE.toString(),
                                         DiscordLang.ACCOUNT_UNLINKED_FIELD_DESCRIPTION.toString(), false)
                                 .setColor(Color.GREEN).build())
@@ -58,7 +64,7 @@ public class UnlinkCommand extends ListenerAdapter {
                     GuildVoiceState voiceState = event.getMember().getVoiceState();
                     if (voiceState != null) {
                         VoiceChannel voiceChannel = voiceState.getChannel();
-                        if (voiceChannel != null && voiceChannel.equals(Config.getLobby())) {
+                        if (voiceChannel != null && voiceChannel.equals(this.config.getLobby())) {
                             player.getPlayer().sendMessage(MinecraftLang.DISCONNECTED_FROM_PROXIMITY_VOICE_CHAT.toString());
                         }
                     }

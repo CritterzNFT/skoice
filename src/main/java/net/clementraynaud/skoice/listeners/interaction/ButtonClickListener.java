@@ -20,6 +20,7 @@
 package net.clementraynaud.skoice.listeners.interaction;
 
 import net.clementraynaud.skoice.Skoice;
+import net.clementraynaud.skoice.bot.Bot;
 import net.clementraynaud.skoice.config.Config;
 import net.clementraynaud.skoice.menus.ErrorEmbeds;
 import net.clementraynaud.skoice.menus.Menu;
@@ -38,19 +39,29 @@ import java.util.Map;
 
 public class ButtonClickListener extends ListenerAdapter {
 
+    private final Skoice plugin;
+    private final Config config;
+    private final Bot bot;
+
+    public ButtonClickListener(Skoice plugin, Config config, Bot bot) {
+        this.plugin = plugin;
+        this.config = config;
+        this.bot = bot;
+    }
+
     public static final Map<String, String> discordIDAxis = new HashMap<>();
 
     @Override
     public void onButtonClick(ButtonClickEvent event) {
         Member member = event.getMember();
         if (member != null && member.hasPermission(Permission.MANAGE_SERVER)) {
-            if (Config.getFile().contains(Config.TEMP_MESSAGE_ID_FIELD)
-                    && Config.getFile().getString(Config.TEMP_MESSAGE_ID_FIELD).equals(event.getMessageId())
+            if (this.config.getFile().contains(Config.TEMP_MESSAGE_ID_FIELD)
+                    && this.config.getFile().getString(Config.TEMP_MESSAGE_ID_FIELD).equals(event.getMessageId())
                     && event.getButton() != null && event.getButton().getId() != null) {
                 String buttonID = event.getButton().getId();
                 if (buttonID.equals(Menu.CLOSE_BUTTON_ID)) {
                     event.getMessage().delete().queue();
-                    if (!Skoice.getPlugin().isBotReady()) {
+                    if (!this.plugin.isBotReady()) {
                         event.replyEmbeds(new EmbedBuilder()
                                         .setTitle(MenuEmoji.GEAR + DiscordLang.CONFIGURATION_EMBED_TITLE.toString())
                                         .addField(MenuEmoji.WARNING + DiscordLang.INCOMPLETE_CONFIGURATION_FIELD_TITLE.toString(),
@@ -58,8 +69,8 @@ public class ButtonClickListener extends ListenerAdapter {
                                         .setColor(Color.RED).build())
                                 .setEphemeral(true).queue();
                     }
-                } else if (!Skoice.getPlugin().isBotReady()) {
-                    event.editMessage(new Response().getMessage()).queue();
+                } else if (!this.plugin.isBotReady()) {
+                    event.editMessage(new Response(this.plugin, this.config, this.bot).getMessage()).queue();
                 } else {
                     if (buttonID.equals(Menu.MODE.name())) {
                         ButtonClickListener.discordIDAxis.remove(member.getId());

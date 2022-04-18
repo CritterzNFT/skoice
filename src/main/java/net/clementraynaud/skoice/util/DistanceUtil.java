@@ -28,7 +28,8 @@ public class DistanceUtil {
     }
 
     public static double getHorizontalDistance(Location location1, Location location2) {
-        return Math.sqrt(NumberConversions.square(location1.getX() - location2.getX()) + NumberConversions.square(location1.getZ() - location2.getZ()));
+        return Math.sqrt(NumberConversions.square(location1.getX() - location2.getX())
+                + NumberConversions.square(location1.getZ() - location2.getZ()));
     }
 
     public static double getVerticalDistance(Location location1, Location location2) {

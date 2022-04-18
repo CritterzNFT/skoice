@@ -46,10 +46,12 @@ public class Config {
 
     private final Skoice plugin;
     private final FileConfiguration file;
+    private final Bot bot;
 
-    public Config(Skoice plugin, FileConfiguration file) {
+    public Config(Skoice plugin, FileConfiguration file, Bot bot) {
         this.plugin = plugin;
         this.file = file;
+        this.bot = bot;
     }
 
     public FileConfiguration getFile() {
@@ -99,19 +101,19 @@ public class Config {
     }
 
     public VoiceChannel getLobby() {
-        if (Bot.getJda() == null) {
+        if (this.bot.getJda() == null) {
             return null;
         }
         String lobbyID = this.file.getString(Config.LOBBY_ID_FIELD);
         if (lobbyID == null) {
             return null;
         }
-        VoiceChannel lobby = Bot.getJda().getVoiceChannelById(lobbyID);
+        VoiceChannel lobby = this.bot.getJda().getVoiceChannelById(lobbyID);
         return lobby != null && lobby.getParent() != null ? lobby : null;
     }
 
     public Category getCategory() {
-        if (Bot.getJda() == null) {
+        if (this.bot.getJda() == null) {
             return null;
         }
         VoiceChannel lobby = this.getLobby();

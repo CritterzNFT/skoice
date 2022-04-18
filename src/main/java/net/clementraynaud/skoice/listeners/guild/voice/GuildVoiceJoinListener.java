@@ -39,13 +39,19 @@ import java.util.UUID;
 
 public class GuildVoiceJoinListener extends ListenerAdapter {
 
+    private final Config config;
+
+    public GuildVoiceJoinListener(Config config) {
+        this.config = config;
+    }
+
     @Override
     public void onGuildVoiceJoin(GuildVoiceJoinEvent event) {
-        new UpdateVoiceStateTask(event.getMember(), event.getChannelJoined()).run();
-        if (!event.getChannelJoined().equals(Config.getLobby())) {
+        new UpdateVoiceStateTask(this.config, event.getMember(), event.getChannelJoined()).run();
+        if (!event.getChannelJoined().equals(this.config.getLobby())) {
             return;
         }
-        String minecraftID = Config.getKeyFromValue(Config.getLinkMap(), event.getMember().getId());
+        String minecraftID = this.config.getKeyFromValue(this.config.getLinkMap(), event.getMember().getId());
         if (minecraftID == null) {
             event.getMember().getUser().openPrivateChannel().complete()
                     .sendMessageEmbeds(new EmbedBuilder().setTitle(MenuEmoji.LINK + DiscordLang.LINKING_PROCESS_EMBED_TITLE.toString())

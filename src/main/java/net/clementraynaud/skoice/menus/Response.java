@@ -38,13 +38,23 @@ import java.awt.*;
 
 public class Response {
 
+    private final Skoice plugin;
+    private final Config config;
+    private final Bot bot;
+
+    public Response(Skoice plugin, Config config, Bot bot) {
+        this.plugin = plugin;
+        this.config = config;
+        this.bot = bot;
+    }
+
     public Message getMessage() {
-        if (!Skoice.getPlugin().isGuildUnique()) {
+        if (!this.plugin.isGuildUnique()) {
             return Menu.SERVER.getMessage();
-        } else if (!Config.getFile().contains(Config.LOBBY_ID_FIELD)) {
+        } else if (!this.config.getFile().contains(Config.LOBBY_ID_FIELD)) {
             return Menu.LOBBY.getMessage();
-        } else if (!Config.getFile().contains(Config.HORIZONTAL_RADIUS_FIELD)
-                || !Config.getFile().contains(Config.VERTICAL_RADIUS_FIELD)) {
+        } else if (!this.config.getFile().contains(Config.HORIZONTAL_RADIUS_FIELD)
+                || !this.config.getFile().contains(Config.VERTICAL_RADIUS_FIELD)) {
             return Menu.MODE.getMessage();
         } else {
             return Menu.CONFIGURATION.getMessage();
@@ -59,16 +69,16 @@ public class Response {
     }
 
     public Message getConfigurationMessage() {
-        if (Config.getFile().contains(Config.TEMP_FIELD)) {
-            Guild guild = Bot.getJda().getGuildById(Config.getFile().getString(Config.TEMP_GUILD_ID_FIELD));
+        if (this.config.getFile().contains(Config.TEMP_FIELD)) {
+            Guild guild = this.bot.getJda().getGuildById(this.config.getFile().getString(Config.TEMP_GUILD_ID_FIELD));
             if (guild != null) {
-                TextChannel textChannel = guild.getTextChannelById(Config.getFile().getString(Config.TEMP_TEXT_CHANNEL_ID_FIELD));
+                TextChannel textChannel = guild.getTextChannelById(this.config.getFile().getString(Config.TEMP_TEXT_CHANNEL_ID_FIELD));
                 if (textChannel != null) {
                     try {
-                        return textChannel.retrieveMessageById(Config.getFile().getString(Config.TEMP_MESSAGE_ID_FIELD)).complete();
+                        return textChannel.retrieveMessageById(this.config.getFile().getString(Config.TEMP_MESSAGE_ID_FIELD)).complete();
                     } catch (ErrorResponseException e) {
-                        Config.getFile().set(Config.TEMP_FIELD, null);
-                        Config.saveFile();
+                        this.config.getFile().set(Config.TEMP_FIELD, null);
+                        this.config.saveFile();
                         ButtonClickListener.discordIDAxis.clear();
                     }
                 }
@@ -78,9 +88,9 @@ public class Response {
     }
 
     public void sendLobbyDeletedAlert(Guild guild) {
-        Config.getFile().set(Config.LOBBY_ID_FIELD, null);
-        Config.saveFile();
-        Skoice.getPlugin().updateConfigurationStatus(false);
+        this.config.getFile().set(Config.LOBBY_ID_FIELD, null);
+        this.config.saveFile();
+        this.plugin.updateConfigurationStatus(false);
         User user = guild.retrieveAuditLogs().limit(1).type(ActionType.CHANNEL_DELETE).complete().get(0).getUser();
         if (user != null && !user.isBot()) {
             user.openPrivateChannel().complete()

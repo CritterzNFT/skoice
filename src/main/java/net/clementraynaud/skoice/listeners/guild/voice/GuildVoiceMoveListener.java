@@ -32,11 +32,17 @@ import java.util.UUID;
 
 public class GuildVoiceMoveListener extends ListenerAdapter {
 
+    private final Config config;
+
+    public GuildVoiceMoveListener(Config config) {
+        this.config = config;
+    }
+
     @Override
     public void onGuildVoiceMove(GuildVoiceMoveEvent event) {
-        if (event.getChannelJoined().getParent() != null && !event.getChannelJoined().getParent().equals(Config.getCategory()) &&
-                event.getChannelLeft().getParent() != null && event.getChannelLeft().getParent().equals(Config.getCategory())) {
-            String minecraftID = Config.getKeyFromValue(Config.getLinkMap(), event.getMember().getId());
+        if (event.getChannelJoined().getParent() != null && !event.getChannelJoined().getParent().equals(this.config.getCategory())
+                && event.getChannelLeft().getParent() != null && event.getChannelLeft().getParent().equals(this.config.getCategory())) {
+            String minecraftID = this.config.getKeyFromValue(this.config.getLinkMap(), event.getMember().getId());
             if (minecraftID == null) {
                 return;
             }
@@ -47,6 +53,6 @@ public class GuildVoiceMoveListener extends ListenerAdapter {
                         .forEach(network -> network.remove(player.getPlayer()));
             }
         }
-        new UpdateVoiceStateTask(event.getMember(), event.getChannelJoined()).run();
+        new UpdateVoiceStateTask(this.config, event.getMember(), event.getChannelJoined()).run();
     }
 }

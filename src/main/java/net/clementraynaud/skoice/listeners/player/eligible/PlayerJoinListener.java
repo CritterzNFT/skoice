@@ -33,16 +33,22 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 public class PlayerJoinListener implements Listener {
 
+    private final Config config;
+
+    public PlayerJoinListener(Config config) {
+        this.config = config;
+    }
+
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         new EligiblePlayers().add(player);
-        Member member = Config.getMember(player.getUniqueId());
+        Member member = this.config.getMember(player.getUniqueId());
         if (member != null) {
             GuildVoiceState voiceState = member.getVoiceState();
             if (voiceState != null) {
                 VoiceChannel voiceChannel = voiceState.getChannel();
-                if (voiceChannel != null && voiceChannel.equals(Config.getLobby())) {
+                if (voiceChannel != null && voiceChannel.equals(this.config.getLobby())) {
                     player.sendMessage(MinecraftLang.CONNECTED_TO_PROXIMITY_VOICE_CHAT.toString());
                 }
             }

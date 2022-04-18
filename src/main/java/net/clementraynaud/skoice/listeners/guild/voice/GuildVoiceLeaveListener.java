@@ -32,12 +32,19 @@ import java.util.UUID;
 
 public class GuildVoiceLeaveListener extends ListenerAdapter {
 
+    private final Config config;
+
+    public GuildVoiceLeaveListener(Config config) {
+        this.config = config;
+    }
+
     @Override
     public void onGuildVoiceLeave(GuildVoiceLeaveEvent event) {
-        if (event.getChannelLeft().getParent() == null || !event.getChannelLeft().getParent().equals(Config.getCategory())) {
+        if (event.getChannelLeft().getParent() == null
+                || !event.getChannelLeft().getParent().equals(this.config.getCategory())) {
             return;
         }
-        String minecraftID = Config.getKeyFromValue(Config.getLinkMap(), event.getMember().getId());
+        String minecraftID = this.config.getKeyFromValue(this.config.getLinkMap(), event.getMember().getId());
         if (minecraftID == null) {
             return;
         }
@@ -46,7 +53,8 @@ public class GuildVoiceLeaveListener extends ListenerAdapter {
             Network.networks.stream()
                     .filter(network -> network.contains(player.getPlayer()))
                     .forEach(network -> network.remove(player.getPlayer()));
-            if (event.getChannelLeft().equals(Config.getLobby()) || Network.networks.stream().anyMatch(network -> network.getChannel().equals(event.getChannelLeft()))) {
+            if (event.getChannelLeft().equals(this.config.getLobby())
+                    || Network.networks.stream().anyMatch(network -> network.getChannel().equals(event.getChannelLeft()))) {
                 player.getPlayer().sendMessage(MinecraftLang.DISCONNECTED_FROM_PROXIMITY_VOICE_CHAT.toString());
             }
         }

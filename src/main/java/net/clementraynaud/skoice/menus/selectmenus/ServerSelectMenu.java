@@ -29,8 +29,6 @@ import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.clementraynaud.skoice.bot.Bot.getJda;
-
 public class ServerSelectMenu extends SelectMenu {
 
     public ServerSelectMenu() {
@@ -39,7 +37,7 @@ public class ServerSelectMenu extends SelectMenu {
 
     @Override
     public SelectionMenu get() {
-        List<Guild> servers = new ArrayList<>(getJda().getGuilds());
+        List<Guild> servers = new ArrayList<>(super.bot.getJda().getGuilds());
         List<SelectOption> options = new ArrayList<>();
         int optionIndex = 0;
         while (optionIndex < 24 && servers.size() > optionIndex) {

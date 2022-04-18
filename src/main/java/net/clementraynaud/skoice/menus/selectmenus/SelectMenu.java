@@ -19,9 +19,10 @@
 
 package net.clementraynaud.skoice.menus.selectmenus;
 
+import net.clementraynaud.skoice.Skoice;
 import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 
-public abstract class SelectMenu {
+public abstract class SelectMenu extends Skoice {
 
     private final boolean isRefreshable;
 

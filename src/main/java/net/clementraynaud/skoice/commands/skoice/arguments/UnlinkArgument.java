@@ -17,9 +17,8 @@
  * along with Skoice.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.clementraynaud.skoice.commands.arguments;
+package net.clementraynaud.skoice.commands.skoice.arguments;
 
-import net.clementraynaud.skoice.config.Config;
 import net.clementraynaud.skoice.lang.DiscordLang;
 import net.clementraynaud.skoice.lang.MinecraftLang;
 import net.clementraynaud.skoice.menus.MenuEmoji;
@@ -48,15 +47,15 @@ public class UnlinkArgument extends Argument {
             return;
         }
         Player player = (Player) this.sender;
-        String discordID = Config.getLinkMap().get(player.getUniqueId().toString());
+        String discordID = super.config.getLinkMap().get(player.getUniqueId().toString());
         if (discordID == null) {
             player.sendMessage(MinecraftLang.ACCOUNT_NOT_LINKED.toString());
             return;
         }
-        Config.unlinkUser(player.getUniqueId().toString());
+        super.config.unlinkUser(player.getUniqueId().toString());
         Member member;
         try {
-            member = Config.getGuild().retrieveMemberById(discordID).complete();
+            member = super.config.getGuild().retrieveMemberById(discordID).complete();
             member.getUser().openPrivateChannel().complete()
                     .sendMessageEmbeds(new EmbedBuilder().setTitle(MenuEmoji.LINK + DiscordLang.LINKING_PROCESS_EMBED_TITLE.toString())
                             .addField(MenuEmoji.HEAVY_CHECK_MARK + DiscordLang.ACCOUNT_UNLINKED_FIELD_TITLE.toString(),
@@ -66,7 +65,8 @@ public class UnlinkArgument extends Argument {
             GuildVoiceState voiceState = member.getVoiceState();
             if (voiceState != null) {
                 VoiceChannel voiceChannel = voiceState.getChannel();
-                if (voiceChannel != null && voiceChannel.equals(Config.getLobby()) || Network.getNetworks().stream().anyMatch(network -> network.getChannel().equals(voiceChannel))) {
+                if (voiceChannel != null && voiceChannel.equals(super.config.getLobby())
+                        || Network.getNetworks().stream().anyMatch(network -> network.getChannel().equals(voiceChannel))) {
                     player.sendMessage(MinecraftLang.DISCONNECTED_FROM_PROXIMITY_VOICE_CHAT.toString());
                 }
             }

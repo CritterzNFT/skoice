@@ -20,6 +20,7 @@
 package net.clementraynaud.skoice.listeners.message.guild;
 
 import net.clementraynaud.skoice.Skoice;
+import net.clementraynaud.skoice.bot.Bot;
 import net.clementraynaud.skoice.config.Config;
 import net.clementraynaud.skoice.listeners.interaction.ButtonClickListener;
 import net.clementraynaud.skoice.menus.Response;
@@ -29,15 +30,25 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class GuildMessageReceivedListener extends ListenerAdapter {
 
+    private final Skoice plugin;
+    private final Config config;
+    private final Bot bot;
+
+    public GuildMessageReceivedListener(Skoice plugin, Config config, Bot bot) {
+        this.plugin = plugin;
+        this.config = config;
+        this.bot = bot;
+    }
+
     @Override
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
         String discordID = event.getAuthor().getId();
         if (discordID.equals(event.getJDA().getSelfUser().getId())) {
             if (!event.getMessage().isEphemeral()) {
-                Config.getFile().set(Config.TEMP_GUILD_ID_FIELD, event.getGuild().getId());
-                Config.getFile().set(Config.TEMP_TEXT_CHANNEL_ID_FIELD, event.getChannel().getId());
-                Config.getFile().set(Config.TEMP_MESSAGE_ID_FIELD, event.getMessageId());
-                Config.saveFile();
+                this.config.getFile().set(Config.TEMP_GUILD_ID_FIELD, event.getGuild().getId());
+                this.config.getFile().set(Config.TEMP_TEXT_CHANNEL_ID_FIELD, event.getChannel().getId());
+                this.config.getFile().set(Config.TEMP_MESSAGE_ID_FIELD, event.getMessageId());
+                this.config.saveFile();
             }
         } else if (ButtonClickListener.discordIDAxis.containsKey(event.getAuthor().getId())
                 && event.getMessage().getContentRaw().length() <= 4
@@ -45,9 +56,9 @@ public class GuildMessageReceivedListener extends ListenerAdapter {
             int value = Integer.parseInt(event.getMessage().getContentRaw());
             if (value >= 1 && value <= 1000) {
                 event.getMessage().delete().queue();
-                Config.getFile().set(ButtonClickListener.discordIDAxis.get(event.getAuthor().getId()), value);
-                Config.saveFile();
-                new Response().deleteMessage();
+                this.config.getFile().set(ButtonClickListener.discordIDAxis.get(event.getAuthor().getId()), value);
+                this.config.saveFile();
+                new Response(this.plugin, this.config, this.bot).deleteMessage();
                 Menu.customizeRadius = false;
                 if (ButtonClickListener.discordIDAxis.get(event.getAuthor().getId()).equals(Config.HORIZONTAL_RADIUS_FIELD)) {
                     Menu.HORIZONTAL_RADIUS.refreshFields();

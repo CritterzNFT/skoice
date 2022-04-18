@@ -31,10 +31,18 @@ import java.util.*;
 
 public class Commands {
 
+    private final Skoice plugin;
+    private final Bot bot;
+
+    public Commands(Skoice plugin, Bot bot) {
+        this.plugin = plugin;
+        this.bot = bot;
+    }
+
     public void register(Guild guild) {
         guild.updateCommands().addCommands(this.getCommands())
                 .queue(null, new ErrorHandler().handle(ErrorResponse.MISSING_ACCESS,
-                        e -> Skoice.getPlugin().getLogger().severe(String.format(LoggerLang.MISSING_ACCESS_ERROR.toString(), Bot.getJda().getSelfUser().getId()))));
+                        e -> this.plugin.getLogger().severe(String.format(LoggerLang.MISSING_ACCESS_ERROR.toString(), this.bot.getJda().getSelfUser().getId()))));
     }
 
     private Set<CommandData> getCommands() {

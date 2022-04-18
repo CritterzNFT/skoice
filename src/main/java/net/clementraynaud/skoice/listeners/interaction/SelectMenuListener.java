@@ -39,23 +39,33 @@ import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 
 public class SelectMenuListener extends ListenerAdapter {
 
+    private final Skoice plugin;
+    private final Config config;
+    private final Bot bot;
+
+    public SelectMenuListener(Skoice plugin, Config config, Bot bot) {
+        this.plugin = plugin;
+        this.config = config;
+        this.bot = bot;
+    }
+
     @Override
     public void onSelectionMenu(SelectionMenuEvent event) {
         Member member = event.getMember();
         if (member != null && member.hasPermission(Permission.MANAGE_SERVER)) {
-            if (Config.getFile().contains(Config.TEMP_MESSAGE_ID_FIELD)
-                    && Config.getFile().getString(Config.TEMP_MESSAGE_ID_FIELD).equals(event.getMessageId())
+            if (this.config.getFile().contains(Config.TEMP_MESSAGE_ID_FIELD)
+                    && this.config.getFile().getString(Config.TEMP_MESSAGE_ID_FIELD).equals(event.getMessageId())
                     && event.getSelectedOptions() != null) {
                 String componentID = event.getComponentId();
                 switch (componentID) {
                     case "SERVER_SELECTION":
-                        if (Bot.getJda().getGuildById(event.getSelectedOptions().get(0).getValue()) != null) {
+                        if (this.bot.getJda().getGuildById(event.getSelectedOptions().get(0).getValue()) != null) {
                             for (SelectOption server : event.getComponent().getOptions()) {
                                 if (!event.getGuild().getId().equals(server.getValue())
-                                        && Bot.getJda().getGuilds().contains(Bot.getJda().getGuildById(server.getValue()))) {
+                                        && this.bot.getJda().getGuilds().contains(this.bot.getJda().getGuildById(server.getValue()))) {
                                     try {
-                                        Bot.getJda().getGuildById(server.getValue()).leave()
-                                                .queue(success -> event.editMessage(new Response().getMessage()).queue());
+                                        this.bot.getJda().getGuildById(server.getValue()).leave()
+                                                .queue(success -> event.editMessage(new Response(this.plugin, this.config, this.bot).getMessage()).queue());
                                     } catch (ErrorResponseException ignored) {
                                     }
                                 }
@@ -63,11 +73,11 @@ public class SelectMenuListener extends ListenerAdapter {
                         }
                         break;
                     case "LANGUAGE_SELECTION":
-                        Config.getFile().set(Config.LANG_FIELD, event.getSelectedOptions().get(0).getValue());
-                        Config.saveFile();
-                        Skoice.getPlugin().updateConfigurationStatus(false);
-                        new Commands().register(event.getGuild());
-                        event.editMessage(new Response().getMessage()).queue();
+                        this.config.getFile().set(Config.LANG_FIELD, event.getSelectedOptions().get(0).getValue());
+                        this.config.saveFile();
+                        this.plugin.updateConfigurationStatus(false);
+                        new Commands(this.plugin, this.bot).register(event.getGuild());
+                        event.editMessage(new Response(this.plugin, this.config, this.bot).getMessage()).queue();
                         break;
                     case "LOBBY_SELECTION":
                         Guild guild = event.getGuild();
@@ -77,35 +87,35 @@ public class SelectMenuListener extends ListenerAdapter {
                                         .complete().getId();
                                 String lobbyID = guild.createVoiceChannel(DiscordLang.DEFAULT_LOBBY_NAME.toString(), event.getGuild().getCategoryById(categoryID))
                                         .complete().getId();
-                                Config.getFile().set(Config.LOBBY_ID_FIELD, lobbyID);
-                                Config.saveFile();
-                                Skoice.getPlugin().updateConfigurationStatus(false);
+                                this.config.getFile().set(Config.LOBBY_ID_FIELD, lobbyID);
+                                this.config.saveFile();
+                                this.plugin.updateConfigurationStatus(false);
                             } else if ("REFRESH" .equals(event.getSelectedOptions().get(0).getValue())) {
-                                event.editMessage(new Response().getMessage()).queue();
+                                event.editMessage(new Response(this.plugin, this.config, this.bot).getMessage()).queue();
                             } else {
                                 VoiceChannel lobby = guild.getVoiceChannelById(event.getSelectedOptions().get(0).getValue());
                                 if (lobby != null && lobby.getParent() != null) {
-                                    Config.getFile().set(Config.LOBBY_ID_FIELD, event.getSelectedOptions().get(0).getValue());
-                                    Config.saveFile();
-                                    Skoice.getPlugin().updateConfigurationStatus(false);
+                                    this.config.getFile().set(Config.LOBBY_ID_FIELD, event.getSelectedOptions().get(0).getValue());
+                                    this.config.saveFile();
+                                    this.plugin.updateConfigurationStatus(false);
                                 }
                             }
                         }
-                        event.editMessage(new Response().getMessage()).queue();
+                        event.editMessage(new Response(this.plugin, this.config, this.bot).getMessage()).queue();
                         break;
                     case "MODE_SELECTION":
                         if ("VANILLA_MODE" .equals(event.getSelectedOptions().get(0).getValue())) {
-                            Config.getFile().set(Config.HORIZONTAL_RADIUS_FIELD, 80);
-                            Config.getFile().set(Config.VERTICAL_RADIUS_FIELD, 40);
-                            Config.saveFile();
-                            Skoice.getPlugin().updateConfigurationStatus(false);
-                            event.editMessage(new Response().getMessage()).queue();
+                            this.config.getFile().set(Config.HORIZONTAL_RADIUS_FIELD, 80);
+                            this.config.getFile().set(Config.VERTICAL_RADIUS_FIELD, 40);
+                            this.config.saveFile();
+                            this.plugin.updateConfigurationStatus(false);
+                            event.editMessage(new Response(this.plugin, this.config, this.bot).getMessage()).queue();
                         } else if ("MINIGAME_MODE" .equals(event.getSelectedOptions().get(0).getValue())) {
-                            Config.getFile().set(Config.HORIZONTAL_RADIUS_FIELD, 40);
-                            Config.getFile().set(Config.VERTICAL_RADIUS_FIELD, 20);
-                            Config.saveFile();
-                            Skoice.getPlugin().updateConfigurationStatus(false);
-                            event.editMessage(new Response().getMessage()).queue();
+                            this.config.getFile().set(Config.HORIZONTAL_RADIUS_FIELD, 40);
+                            this.config.getFile().set(Config.VERTICAL_RADIUS_FIELD, 20);
+                            this.config.saveFile();
+                            this.plugin.updateConfigurationStatus(false);
+                            event.editMessage(new Response(this.plugin, this.config, this.bot).getMessage()).queue();
                         } else if ("CUSTOMIZE" .equals(event.getSelectedOptions().get(0).getValue())) {
                             Menu.customizeRadius = true;
                             event.editMessage(Menu.MODE.getMessage()).queue();
@@ -113,21 +123,21 @@ public class SelectMenuListener extends ListenerAdapter {
                         break;
                     case "ACTION_BAR_ALERT":
                         if ("true" .equals(event.getSelectedOptions().get(0).getValue())) {
-                            Config.getFile().set(Config.ACTION_BAR_ALERT_FIELD, true);
+                            this.config.getFile().set(Config.ACTION_BAR_ALERT_FIELD, true);
                         } else if ("false" .equals(event.getSelectedOptions().get(0).getValue())) {
-                            Config.getFile().set(Config.ACTION_BAR_ALERT_FIELD, false);
+                            this.config.getFile().set(Config.ACTION_BAR_ALERT_FIELD, false);
                         }
-                        Config.saveFile();
-                        event.editMessage(new Response().getMessage()).queue();
+                        this.config.saveFile();
+                        event.editMessage(new Response(this.plugin, this.config, this.bot).getMessage()).queue();
                         break;
                     case "CHANNEL_VISIBILITY":
                         if ("true" .equals(event.getSelectedOptions().get(0).getValue())) {
-                            Config.getFile().set(Config.CHANNEL_VISIBILITY_FIELD, true);
+                            this.config.getFile().set(Config.CHANNEL_VISIBILITY_FIELD, true);
                         } else if ("false" .equals(event.getSelectedOptions().get(0).getValue())) {
-                            Config.getFile().set(Config.CHANNEL_VISIBILITY_FIELD, false);
+                            this.config.getFile().set(Config.CHANNEL_VISIBILITY_FIELD, false);
                         }
-                        Config.saveFile();
-                        event.editMessage(new Response().getMessage()).queue();
+                        this.config.saveFile();
+                        event.editMessage(new Response(this.plugin, this.config, this.bot).getMessage()).queue();
                         break;
                     default:
                         throw new IllegalStateException(String.format(LoggerLang.UNEXPECTED_VALUE.toString(), componentID));

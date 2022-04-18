@@ -21,7 +21,6 @@ package net.clementraynaud.skoice.lang;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import net.clementraynaud.skoice.Skoice;
 import net.clementraynaud.skoice.config.Config;
 import org.bukkit.ChatColor;
 

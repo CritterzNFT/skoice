@@ -17,11 +17,8 @@
  * along with Skoice.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.clementraynaud.skoice.commands.arguments;
+package net.clementraynaud.skoice.commands.skoice.arguments;
 
-import net.clementraynaud.skoice.Skoice;
-import net.clementraynaud.skoice.bot.Bot;
-import net.clementraynaud.skoice.config.Config;
 import net.clementraynaud.skoice.lang.MinecraftLang;
 import org.bukkit.command.CommandSender;
 
@@ -44,10 +41,10 @@ public class TokenArgument extends Argument {
             this.sender.sendMessage(MinecraftLang.INVALID_TOKEN.toString());
             return;
         }
-        Config.setToken(this.arg);
-        Skoice.getPlugin().setTokenBoolean(true);
-        if (Bot.getJda() == null) {
-            Skoice.getPlugin().getBot().connectBot(false, this.sender);
+        super.config.setToken(this.arg);
+        super.plugin.setTokenBoolean(true);
+        if (super.bot.getJda() == null) {
+            super.bot.connect(false, this.sender);
         } else {
             this.sender.sendMessage(MinecraftLang.BOT_ALREADY_CONNECTED.toString());
         }

@@ -33,8 +33,16 @@ public class OutdatedConfig {
 
     private final FileConfiguration oldData = new YamlConfiguration();
 
+    private final Skoice plugin;
+    private final Config config;
+
+    public OutdatedConfig(Skoice plugin, Config config) {
+        this.plugin = plugin;
+        this.config = config;
+    }
+
     public void update() {
-        File outdatedConfig = new File(Skoice.getPlugin().getDataFolder() + File.separator + "data.yml");
+        File outdatedConfig = new File(this.plugin.getDataFolder() + File.separator + "data.yml");
         if (outdatedConfig.exists()) {
             try {
                 this.oldData.load(outdatedConfig);
@@ -45,7 +53,7 @@ public class OutdatedConfig {
             this.convertOldData("mainVoiceChannelID", Config.LOBBY_ID_FIELD);
             this.convertOldRadius();
             this.convertOldLinks();
-            Config.saveFile();
+            this.config.saveFile();
             try {
                 Files.delete(outdatedConfig.toPath());
             } catch (IOException ignored) {
@@ -56,8 +64,8 @@ public class OutdatedConfig {
     private void convertOldToken() {
         if (this.oldData.contains("token")
                 && !this.oldData.getString("token").isEmpty()
-                && !Config.getFile().contains(Config.TOKEN_FIELD)) {
-            Config.setToken(this.oldData.getString("token"));
+                && !this.config.getFile().contains(Config.TOKEN_FIELD)) {
+            this.config.setToken(this.oldData.getString("token"));
         }
     }
 
@@ -67,11 +75,11 @@ public class OutdatedConfig {
             this.convertOldData("distance.horizontalStrength", Config.HORIZONTAL_RADIUS_FIELD);
             this.convertOldData("distance.verticalStrength", Config.VERTICAL_RADIUS_FIELD);
         } else {
-            if (!Config.getFile().contains(Config.HORIZONTAL_RADIUS_FIELD)) {
-                Config.getFile().set(Config.HORIZONTAL_RADIUS_FIELD, 80);
+            if (!this.config.getFile().contains(Config.HORIZONTAL_RADIUS_FIELD)) {
+                this.config.getFile().set(Config.HORIZONTAL_RADIUS_FIELD, 80);
             }
-            if (!Config.getFile().contains(Config.VERTICAL_RADIUS_FIELD)) {
-                Config.getFile().set(Config.VERTICAL_RADIUS_FIELD, 40);
+            if (!this.config.getFile().contains(Config.VERTICAL_RADIUS_FIELD)) {
+                this.config.getFile().set(Config.VERTICAL_RADIUS_FIELD, 40);
             }
         }
     }
@@ -84,16 +92,16 @@ public class OutdatedConfig {
             for (int i = 0; i < subkeys.size(); i += 2) {
                 linkMap.put(iterator.next(), iterator.next());
             }
-            linkMap.putAll(Config.getLinkMap());
-            Config.getFile().set(Config.LINK_MAP_FIELD, linkMap);
+            linkMap.putAll(this.config.getLinkMap());
+            this.config.getFile().set(Config.LINK_MAP_FIELD, linkMap);
         }
     }
 
     private void convertOldData(String oldField, String newField) {
         if (this.oldData.contains(oldField)
                 && !this.oldData.getString(oldField).isEmpty()
-                && !Config.getFile().contains(newField)) {
-            Config.getFile().set(newField, this.oldData.get(oldField));
+                && !this.config.getFile().contains(newField)) {
+            this.config.getFile().set(newField, this.oldData.get(oldField));
         }
     }
 }
