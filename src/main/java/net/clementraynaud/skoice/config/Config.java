@@ -85,16 +85,12 @@ public class Config {
     }
 
     public static void linkUser(String minecraftID, String discordID) {
-        Map<String, String> linkMap = Config.getLinkMap();
-        linkMap.put(minecraftID, discordID);
-        Skoice.getPlugin().getConfig().set(Config.LINK_MAP_FIELD, linkMap);
+        Skoice.getPlugin().getConfig().set(Config.LINK_MAP_FIELD + "." + minecraftID, discordID);
         Skoice.getPlugin().saveConfig();
     }
 
     public static void unlinkUser(String minecraftID) {
-        Map<String, String> linkMap = Config.getLinkMap();
-        linkMap.remove(minecraftID);
-        Skoice.getPlugin().getConfig().set(Config.LINK_MAP_FIELD, linkMap);
+        Skoice.getPlugin().getConfig().set(Config.LINK_MAP_FIELD + "." + minecraftID, null);
         Skoice.getPlugin().saveConfig();
     }
 
