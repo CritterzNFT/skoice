@@ -25,6 +25,7 @@ import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 
 import java.util.*;
 
@@ -63,17 +64,38 @@ public class Config {
                 return entry.getKey();
             }
         }
-
         return null;
     }
 
     public static Member getMember(UUID minecraftID) {
-        String discordID = Config.getLinkMap().get(minecraftID);
+        String discordID = Config.getLinkMap().get(minecraftID.toString());
+        if (discordID == null) {
+            return null;
+        }
         Guild guild = Config.getGuild();
         if (guild == null) {
             return null;
         }
-        return discordID != null ? guild.getMemberById(discordID) : null;
+        Member member = null;
+        try {
+            member = guild.retrieveMemberById(discordID).complete();
+        } catch (ErrorResponseException ignored) {
+        }
+        return member;
+    }
+
+    public static void linkUser(String minecraftID, String discordID) {
+        Map<String, String> linkMap = Config.getLinkMap();
+        linkMap.put(minecraftID, discordID);
+        Skoice.getPlugin().getConfig().set(Config.LINK_MAP_FIELD, linkMap);
+        Skoice.getPlugin().saveConfig();
+    }
+
+    public static void unlinkUser(String minecraftID) {
+        Map<String, String> linkMap = Config.getLinkMap();
+        linkMap.remove(minecraftID);
+        Skoice.getPlugin().getConfig().set(Config.LINK_MAP_FIELD, linkMap);
+        Skoice.getPlugin().saveConfig();
     }
 
     public static void setToken(String token) {
@@ -136,19 +158,5 @@ public class Config {
 
     public static boolean getChannelVisibility() {
         return Skoice.getPlugin().getConfig().getBoolean(Config.CHANNEL_VISIBILITY_FIELD);
-    }
-
-    public static void linkUser(String minecraftID, String discordID) {
-        Map<String, String> linkMap = Config.getLinkMap();
-        linkMap.put(minecraftID, discordID);
-        Skoice.getPlugin().getConfig().set(Config.LINK_MAP_FIELD, linkMap);
-        Skoice.getPlugin().saveConfig();
-    }
-
-    public static void unlinkUser(String minecraftID) {
-        Map<String, String> linkMap = Config.getLinkMap();
-        linkMap.remove(minecraftID);
-        Skoice.getPlugin().getConfig().set(Config.LINK_MAP_FIELD, linkMap);
-        Skoice.getPlugin().saveConfig();
     }
 }
