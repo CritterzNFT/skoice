@@ -91,8 +91,9 @@ public class UpdateNetworksTask implements Task {
                 }
                 membersInLobby.addAll(voiceChannel.getMembers());
             }
+            Map<String, String> linkMap = new HashMap<>(Config.getLinkMap());
             for (Member member : membersInLobby) {
-                String minecraftID = Config.getKeyFromValue(Config.getLinkMap(), member.getId());
+                String minecraftID = Config.getKeyFromValue(linkMap, member.getId());
                 VoiceChannel playerChannel = member.getVoiceState().getChannel();
                 Network playerNetwork = minecraftID != null ? Network.networks.stream()
                         .filter(n -> n.contains(UUID.fromString(minecraftID)))
