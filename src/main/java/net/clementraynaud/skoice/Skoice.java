@@ -106,12 +106,12 @@ public class Skoice extends JavaPlugin {
         this.saveConfig();
         new OutdatedConfig().update();
         this.isTokenSet = this.getConfig().contains(Config.TOKEN_FIELD);
+        this.eligiblePlayers = new EligiblePlayers();
         Skoice.setBot(new Bot(this.eligiblePlayers));
         SkoiceCommand skoiceCommand = new SkoiceCommand();
         this.getCommand("skoice").setExecutor(skoiceCommand);
         this.getCommand("skoice").setTabCompleter(skoiceCommand);
         this.checkVersion();
-        this.eligiblePlayers = new EligiblePlayers();
     }
 
     public void checkVersion() {
