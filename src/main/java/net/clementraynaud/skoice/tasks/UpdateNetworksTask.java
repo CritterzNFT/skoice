@@ -65,7 +65,7 @@ public class UpdateNetworksTask implements Task {
             this.muteMembers(lobby);
             Network.networks.removeIf(network -> network.getChannel() == null && network.isInitialized());
             Set<UUID> oldEligiblePlayers = this.eligiblePlayers.get();
-            this.eligiblePlayers = new EligiblePlayers();
+            this.eligiblePlayers.clear();
             for (UUID minecraftID : oldEligiblePlayers) {
                 Player player = Bukkit.getPlayer(minecraftID);
                 if (player != null) {

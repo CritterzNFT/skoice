@@ -27,13 +27,17 @@ import java.util.UUID;
 
 public class EligiblePlayers {
 
-    private static final Set<UUID> players = new HashSet<>();
+    private final Set<UUID> players = new HashSet<>();
 
     public void add(Player player) {
-        EligiblePlayers.players.add(player.getUniqueId());
+        this.players.add(player.getUniqueId());
     }
 
     public Set<UUID> get() {
-        return EligiblePlayers.players;
+        return this.players;
+    }
+
+    public void clear() {
+        this.players.clear();
     }
 }
