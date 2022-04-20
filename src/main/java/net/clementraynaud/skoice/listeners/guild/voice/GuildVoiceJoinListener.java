@@ -39,6 +39,12 @@ import java.util.UUID;
 
 public class GuildVoiceJoinListener extends ListenerAdapter {
 
+    private final EligiblePlayers eligiblePlayers;
+
+    public GuildVoiceJoinListener(EligiblePlayers eligiblePlayers) {
+        this.eligiblePlayers = eligiblePlayers;
+    }
+
     @Override
     public void onGuildVoiceJoin(GuildVoiceJoinEvent event) {
         new UpdateVoiceStateTask(event.getMember(), event.getChannelJoined()).run();
@@ -56,7 +62,7 @@ public class GuildVoiceJoinListener extends ListenerAdapter {
         } else {
             OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(minecraftID));
             if (player.isOnline() && player.getPlayer() != null) {
-                new EligiblePlayers().add(player.getPlayer());
+                this.eligiblePlayers.add(player.getPlayer());
                 player.getPlayer().sendMessage(MinecraftLang.CONNECTED_TO_PROXIMITY_VOICE_CHAT.toString());
             }
         }

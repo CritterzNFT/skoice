@@ -40,6 +40,7 @@ import net.clementraynaud.skoice.lang.MinecraftLang;
 import net.clementraynaud.skoice.commands.LinkCommand;
 import net.clementraynaud.skoice.commands.UnlinkCommand;
 import net.clementraynaud.skoice.listeners.message.priv.PrivateMessageReceivedListener;
+import net.clementraynaud.skoice.system.EligiblePlayers;
 import net.clementraynaud.skoice.tasks.UpdateNetworksTask;
 import net.clementraynaud.skoice.system.Network;
 import net.clementraynaud.skoice.util.MessageUtil;
@@ -79,7 +80,10 @@ public class Bot {
 
     private static JDA jda;
 
-    public Bot() {
+    private final EligiblePlayers eligiblePlayers;
+
+    public Bot(EligiblePlayers eligiblePlayers) {
+        this.eligiblePlayers = eligiblePlayers;
         this.connectBot(true, null);
     }
 
@@ -143,7 +147,7 @@ public class Bot {
                 Bukkit.getScheduler().runTaskLater(Skoice.getPlugin(), () ->
                                 Bukkit.getScheduler().runTaskTimerAsynchronously(
                                         Skoice.getPlugin(),
-                                        new UpdateNetworksTask()::run,
+                                        new UpdateNetworksTask(this.eligiblePlayers)::run,
                                         0,
                                         10
                                 ),

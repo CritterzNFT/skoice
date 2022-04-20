@@ -36,8 +36,4 @@ public class EligiblePlayers {
     public Set<UUID> get() {
         return EligiblePlayers.players;
     }
-
-    public void clear() {
-        EligiblePlayers.players.clear();
-    }
 }

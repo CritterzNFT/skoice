@@ -46,6 +46,12 @@ public class UpdateNetworksTask implements Task {
     public static final Map<String, Pair<String, CompletableFuture<Void>>> awaitingMoves = new ConcurrentHashMap<>();
     private static final ReentrantLock lock = new ReentrantLock();
 
+    private EligiblePlayers eligiblePlayers;
+
+    public UpdateNetworksTask(EligiblePlayers eligiblePlayers) {
+        this.eligiblePlayers = eligiblePlayers;
+    }
+
     @Override
     public void run() {
         if (!UpdateNetworksTask.lock.tryLock()) {
@@ -58,9 +64,8 @@ public class UpdateNetworksTask implements Task {
             }
             this.muteMembers(lobby);
             Network.networks.removeIf(network -> network.getChannel() == null && network.isInitialized());
-            EligiblePlayers eligiblePlayers = new EligiblePlayers();
-            Set<UUID> oldEligiblePlayers = eligiblePlayers.get();
-            eligiblePlayers.clear();
+            Set<UUID> oldEligiblePlayers = this.eligiblePlayers.get();
+            this.eligiblePlayers = new EligiblePlayers();
             for (UUID minecraftID : oldEligiblePlayers) {
                 Player player = Bukkit.getPlayer(minecraftID);
                 if (player != null) {

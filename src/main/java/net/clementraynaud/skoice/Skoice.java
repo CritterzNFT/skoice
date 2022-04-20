@@ -36,6 +36,7 @@ import net.clementraynaud.skoice.listeners.guild.voice.GuildVoiceMoveListener;
 import net.clementraynaud.skoice.listeners.player.eligible.PlayerJoinListener;
 import net.clementraynaud.skoice.listeners.player.eligible.PlayerQuitListener;
 import net.clementraynaud.skoice.lang.LoggerLang;
+import net.clementraynaud.skoice.system.EligiblePlayers;
 import net.clementraynaud.skoice.tasks.InterruptSystemTask;
 import net.clementraynaud.skoice.util.UpdateUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -55,6 +56,7 @@ public class Skoice extends JavaPlugin {
 
     private static Skoice plugin;
     private static Bot bot;
+    private EligiblePlayers eligiblePlayers;
     private boolean isTokenSet;
     private boolean isBotReady;
     private boolean isGuildUnique;
@@ -104,11 +106,12 @@ public class Skoice extends JavaPlugin {
         this.saveConfig();
         new OutdatedConfig().update();
         this.isTokenSet = this.getConfig().contains(Config.TOKEN_FIELD);
-        Skoice.setBot(new Bot());
+        Skoice.setBot(new Bot(this.eligiblePlayers));
         SkoiceCommand skoiceCommand = new SkoiceCommand();
         this.getCommand("skoice").setExecutor(skoiceCommand);
         this.getCommand("skoice").setTabCompleter(skoiceCommand);
         this.checkVersion();
+        this.eligiblePlayers = new EligiblePlayers();
     }
 
     public void checkVersion() {
@@ -160,7 +163,7 @@ public class Skoice extends JavaPlugin {
         if (startup) {
             if (this.isBotReady) {
                 this.registerEligiblePlayerListeners();
-                Bot.getJda().addEventListener(new GuildVoiceJoinListener(), new GuildVoiceLeaveListener(), new GuildVoiceMoveListener(), new VoiceChannelDeleteListener());
+                Bot.getJda().addEventListener(new GuildVoiceJoinListener(this.eligiblePlayers), new GuildVoiceLeaveListener(), new GuildVoiceMoveListener(), new VoiceChannelDeleteListener());
             } else {
                 Bukkit.getPluginManager().registerEvents(new net.clementraynaud.skoice.listeners.player.PlayerJoinListener(), Skoice.plugin);
                 if (Bot.getJda() != null) {
@@ -170,7 +173,7 @@ public class Skoice extends JavaPlugin {
         } else if (!wasBotReady && this.isBotReady) {
             HandlerList.unregisterAll(new net.clementraynaud.skoice.listeners.player.PlayerJoinListener());
             this.registerEligiblePlayerListeners();
-            Bot.getJda().addEventListener(new GuildVoiceJoinListener(), new GuildVoiceLeaveListener(), new GuildVoiceMoveListener(), new VoiceChannelDeleteListener());
+            Bot.getJda().addEventListener(new GuildVoiceJoinListener(this.eligiblePlayers), new GuildVoiceLeaveListener(), new GuildVoiceMoveListener(), new VoiceChannelDeleteListener());
             Menu.MODE.refreshFields();
             this.getLogger().info(LoggerLang.CONFIGURATION_COMPLETE_INFO.toString());
             Message configurationMessage = new Response().getConfigurationMessage();
@@ -187,7 +190,7 @@ public class Skoice extends JavaPlugin {
             this.unregisterEligiblePlayerListeners();
             Bukkit.getPluginManager().registerEvents(new net.clementraynaud.skoice.listeners.player.PlayerJoinListener(), Skoice.plugin);
             if (Bot.getJda() != null) {
-                Bot.getJda().removeEventListener(new GuildVoiceJoinListener(), new GuildVoiceLeaveListener(), new GuildVoiceMoveListener(), new VoiceChannelDeleteListener());
+                Bot.getJda().removeEventListener(new GuildVoiceJoinListener(this.eligiblePlayers), new GuildVoiceLeaveListener(), new GuildVoiceMoveListener(), new VoiceChannelDeleteListener());
                 Menu.MODE.refreshFields();
             }
             new InterruptSystemTask().run();
@@ -195,17 +198,17 @@ public class Skoice extends JavaPlugin {
     }
 
     private void registerEligiblePlayerListeners() {
-        Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(), Skoice.plugin);
+        Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this.eligiblePlayers), Skoice.plugin);
         Bukkit.getPluginManager().registerEvents(new PlayerQuitListener(), Skoice.plugin);
-        Bukkit.getPluginManager().registerEvents(new PlayerMoveListener(), Skoice.plugin);
-        Bukkit.getPluginManager().registerEvents(new PlayerTeleportListener(), Skoice.plugin);
+        Bukkit.getPluginManager().registerEvents(new PlayerMoveListener(this.eligiblePlayers), Skoice.plugin);
+        Bukkit.getPluginManager().registerEvents(new PlayerTeleportListener(this.eligiblePlayers), Skoice.plugin);
     }
 
     private void unregisterEligiblePlayerListeners() {
-        HandlerList.unregisterAll(new PlayerJoinListener());
+        HandlerList.unregisterAll(new PlayerJoinListener(this.eligiblePlayers));
         HandlerList.unregisterAll(new PlayerQuitListener());
-        HandlerList.unregisterAll(new PlayerMoveListener());
-        HandlerList.unregisterAll(new PlayerTeleportListener());
+        HandlerList.unregisterAll(new PlayerMoveListener(this.eligiblePlayers));
+        HandlerList.unregisterAll(new PlayerTeleportListener(this.eligiblePlayers));
     }
 
     @Override

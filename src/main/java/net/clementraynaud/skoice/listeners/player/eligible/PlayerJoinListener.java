@@ -33,10 +33,16 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 public class PlayerJoinListener implements Listener {
 
+    private final EligiblePlayers eligiblePlayers;
+
+    public PlayerJoinListener(EligiblePlayers eligiblePlayers) {
+        this.eligiblePlayers = eligiblePlayers;
+    }
+
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        new EligiblePlayers().add(player);
+        this.eligiblePlayers.add(player);
         Member member = Config.getMember(player.getUniqueId());
         if (member != null) {
             GuildVoiceState voiceState = member.getVoiceState();
