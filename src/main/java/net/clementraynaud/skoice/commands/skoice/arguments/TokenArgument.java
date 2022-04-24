@@ -41,10 +41,13 @@ public class TokenArgument extends Argument {
             this.sender.sendMessage(MinecraftLang.INVALID_TOKEN.toString());
             return;
         }
-        super.config.setToken(this.arg);
-        super.plugin.setTokenBoolean(true);
+        super.config.getUpdater().setToken(this.arg);
         if (super.bot.getJda() == null) {
-            super.bot.connect(false, this.sender);
+            super.bot.connect(this.sender);
+            if (super.bot.getJda() != null) {
+                this.config.initializeReader(this.bot);
+                super.bot.setup(false, this.sender);
+            }
         } else {
             this.sender.sendMessage(MinecraftLang.BOT_ALREADY_CONNECTED.toString());
         }

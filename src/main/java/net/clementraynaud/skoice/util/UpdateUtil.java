@@ -19,7 +19,6 @@
 
 package net.clementraynaud.skoice.util;
 
-import net.clementraynaud.skoice.lang.LoggerLang;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 

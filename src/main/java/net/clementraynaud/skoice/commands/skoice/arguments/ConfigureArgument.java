@@ -19,6 +19,7 @@
 
 package net.clementraynaud.skoice.commands.skoice.arguments;
 
+import net.clementraynaud.skoice.config.ConfigField;
 import net.clementraynaud.skoice.lang.MinecraftLang;
 import net.clementraynaud.skoice.util.MessageUtil;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -40,8 +41,8 @@ public class ConfigureArgument extends Argument {
             return;
         }
         Player player = (Player) this.sender;
-        if (super.plugin.isTokenSet() && super.bot.getJda() != null) {
-            if (super.plugin.isBotReady()) {
+        if (super.config.getFile().contains(ConfigField.TOKEN.get()) && super.bot.getJda() != null) {
+            if (super.bot.isReady()) {
                 player.sendMessage(MinecraftLang.ALREADY_CONFIGURED.toString());
             } else {
                 player.sendMessage(MinecraftLang.INCOMPLETE_CONFIGURATION_OPERATOR_DISCORD.toString());

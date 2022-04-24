@@ -19,7 +19,7 @@
 
 package net.clementraynaud.skoice.commands;
 
-import net.clementraynaud.skoice.Skoice;
+import net.clementraynaud.skoice.bot.Bot;
 import net.clementraynaud.skoice.config.Config;
 import net.clementraynaud.skoice.lang.DiscordLang;
 import net.clementraynaud.skoice.menus.MenuEmoji;
@@ -36,12 +36,12 @@ public class LinkCommand extends ListenerAdapter {
 
     private static final Map<String, String> discordIDCode = new HashMap<>();
 
-    private final Skoice plugin;
     private final Config config;
+    private final Bot bot;
 
-    public LinkCommand(Skoice plugin, Config config) {
-        this.plugin = plugin;
+    public LinkCommand(Config config, Bot bot) {
         this.config = config;
+        this.bot = bot;
     }
 
     public static Map<String, String> getDiscordIDCode() {
@@ -55,7 +55,7 @@ public class LinkCommand extends ListenerAdapter {
     @Override
     public void onSlashCommand(SlashCommandEvent event) {
         if ("link" .equals(event.getName())) {
-            if (!this.plugin.isBotReady()) {
+            if (!this.bot.isReady()) {
                 EmbedBuilder embed = new EmbedBuilder().setTitle(MenuEmoji.GEAR + DiscordLang.CONFIGURATION_EMBED_TITLE.toString());
                 event.replyEmbeds(embed.addField(MenuEmoji.WARNING + DiscordLang.INCOMPLETE_CONFIGURATION_FIELD_TITLE.toString(),
                                         DiscordLang.INCOMPLETE_CONFIGURATION_FIELD_DESCRIPTION.toString(), false)
@@ -64,7 +64,7 @@ public class LinkCommand extends ListenerAdapter {
                 return;
             }
             EmbedBuilder embed = new EmbedBuilder().setTitle(MenuEmoji.LINK + DiscordLang.LINKING_PROCESS_EMBED_TITLE.toString());
-            if (this.config.getLinkMap().containsValue(event.getUser().getId())) {
+            if (this.config.getReader().getLinkMap().containsValue(event.getUser().getId())) {
                 event.replyEmbeds(embed.addField(MenuEmoji.WARNING + DiscordLang.ACCOUNT_ALREADY_LINKED_FIELD_TITLE.toString(),
                                         DiscordLang.ACCOUNT_ALREADY_LINKED_FIELD_DESCRIPTION.toString(), false)
                                 .setColor(Color.RED).build())

@@ -19,7 +19,7 @@
 
 package net.clementraynaud.skoice.menus.selectmenus;
 
-import net.clementraynaud.skoice.config.Config;
+import net.clementraynaud.skoice.config.ConfigField;
 import net.clementraynaud.skoice.menus.Menu;
 import net.clementraynaud.skoice.menus.MenuEmoji;
 import net.clementraynaud.skoice.lang.DiscordLang;
@@ -66,10 +66,10 @@ public class LobbySelectMenu extends SelectMenu {
                     .withDescription(DiscordLang.TOO_MANY_OPTIONS_SELECT_OPTION_DESCRIPTION.toString())
                     .withEmoji(MenuEmoji.WARNING.getEmojiFromUnicode()));
         }
-        if (super.plugin.isBotReady()) {
+        if (super.bot.isReady()) {
             return SelectionMenu.create(Menu.LOBBY.name() + "_SELECTION")
                     .addOptions(options)
-                    .setDefaultValues(Collections.singleton(super.config.getFile().getString(Config.LOBBY_ID_FIELD))).build();
+                    .setDefaultValues(Collections.singleton(super.config.getFile().getString(ConfigField.LOBBY_ID.get()))).build();
         } else {
             return SelectionMenu.create(Menu.LOBBY.name() + "_SELECTION")
                     .setPlaceholder(DiscordLang.LOBBY_SELECT_MENU_PLACEHOLDER.toString())

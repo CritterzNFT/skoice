@@ -23,6 +23,7 @@ import net.clementraynaud.skoice.Skoice;
 import net.clementraynaud.skoice.commands.ConfigureCommand;
 import net.clementraynaud.skoice.commands.InviteCommand;
 import net.clementraynaud.skoice.config.Config;
+import net.clementraynaud.skoice.config.ConfigField;
 import net.clementraynaud.skoice.listeners.interaction.ButtonClickListener;
 import net.clementraynaud.skoice.menus.MenuEmoji;
 import net.clementraynaud.skoice.menus.Response;
@@ -42,6 +43,7 @@ import net.clementraynaud.skoice.commands.UnlinkCommand;
 import net.clementraynaud.skoice.listeners.message.priv.PrivateMessageReceivedListener;
 import net.clementraynaud.skoice.tasks.UpdateNetworksTask;
 import net.clementraynaud.skoice.system.Network;
+import net.clementraynaud.skoice.util.MapUtil;
 import net.clementraynaud.skoice.util.MessageUtil;
 import net.clementraynaud.skoice.util.UpdateUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -71,6 +73,8 @@ public class Bot {
     private static final int TICKS_BETWEEN_VERSION_CHECKING = 720000;
 
     private JDA jda;
+    private boolean isReady;
+    private boolean isOnMultipleGuilds;
 
     private final Skoice plugin;
     private final Config config;
@@ -84,9 +88,21 @@ public class Bot {
         return this.jda;
     }
 
-    public void connect(boolean startup, CommandSender sender) {
-        if (this.plugin.isTokenSet()) {
-            byte[] base64TokenBytes = Base64.getDecoder().decode(this.config.getFile().getString(Config.TOKEN_FIELD));
+    public void setReady(boolean ready) {
+        this.isReady = ready;
+    }
+
+    public boolean isReady() {
+        return this.isReady;
+    }
+
+    public boolean isOnMultipleGuilds() {
+        return this.isOnMultipleGuilds;
+    }
+
+    public void connect(CommandSender sender) {
+        if (this.config.getFile().contains(ConfigField.TOKEN.get())) {
+            byte[] base64TokenBytes = Base64.getDecoder().decode(this.config.getFile().getString(ConfigField.TOKEN.get()));
             for (int i = 0; i < base64TokenBytes.length; i++) {
                 base64TokenBytes[i]--;
             }
@@ -102,7 +118,7 @@ public class Bot {
                     this.plugin.getLogger().severe(LoggerLang.BOT_COULD_NOT_CONNECT_ERROR.toString());
                 } else {
                     sender.sendMessage(MinecraftLang.BOT_COULD_NOT_CONNECT.toString());
-                    this.config.getFile().set(Config.TOKEN_FIELD, null);
+                    this.config.getFile().set(ConfigField.TOKEN.get(), null);
                     this.config.saveFile();
                 }
             } catch (IllegalStateException e) {
@@ -125,43 +141,44 @@ public class Bot {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            if (this.jda != null) {
-                this.setDefaultAvatar();
-                new Response(this.plugin, this.config, this).deleteMessage();
-                this.updateGuildUniquenessStatus();
-                this.checkForValidLobby();
-                this.checkForUnlinkedUsersInLobby();
-                this.jda.getGuilds().forEach(new Commands(this.plugin, this)::register);
-                this.jda.addEventListener(Arrays.asList(new ReconnectedListener(this.plugin, this.config, this), new GuildJoinListener(this.plugin, this),
-                        new GuildLeaveListener(this.plugin, this), new PrivateMessageReceivedListener(),
-                        new GuildMessageReceivedListener(this.plugin, this.config, this), new GuildMessageDeleteListener(this.config),
-                        new VoiceChannelDeleteListener(this.plugin, this.config, this), new VoiceChannelUpdateParentListener(this.plugin, this.config, this),
-                        new ConfigureCommand(this.plugin, this.config, this), new InviteCommand(), new LinkCommand(this.plugin, this.config), new UnlinkCommand(this.config),
-                        new ButtonClickListener(this.plugin, this.config, this), new SelectMenuListener(this.plugin, this.config, this)));
-                Bukkit.getScheduler().runTaskLater(this.plugin, () ->
-                                Bukkit.getScheduler().runTaskTimerAsynchronously(
-                                        this.plugin,
-                                        new UpdateNetworksTask(this.config)::run,
-                                        0,
-                                        10
-                                ),
-                        0
-                );
-                Bukkit.getScheduler().runTaskLater(this.plugin, () ->
-                                Bukkit.getScheduler().runTaskTimerAsynchronously(
-                                        this.plugin,
-                                        new UpdateUtil(this.plugin, Skoice.RESSOURCE_ID, LoggerLang.OUTDATED_VERSION_WARNING.toString())::checkVersion,
-                                        Bot.TICKS_BETWEEN_VERSION_CHECKING,
-                                        Bot.TICKS_BETWEEN_VERSION_CHECKING
-                                ),
-                        0
-                );
-                this.retrieveNetworks();
-            }
         }
+    }
+
+    public void setup(boolean startup, CommandSender sender) {
+        this.setDefaultAvatar();
+        new Response(this.plugin, this.config, this).deleteMessage();
+        this.updateGuildUniquenessStatus();
+        this.checkForValidLobby();
+        this.checkForUnlinkedUsersInLobby();
+        this.jda.getGuilds().forEach(new Commands(this.plugin, this)::register);
+        this.jda.addEventListener(Arrays.asList(new ReconnectedListener(this.plugin, this.config, this), new GuildJoinListener(this.plugin, this),
+                new GuildLeaveListener(this.plugin, this), new PrivateMessageReceivedListener(),
+                new GuildMessageReceivedListener(this.plugin, this.config, this), new GuildMessageDeleteListener(this.config),
+                new VoiceChannelDeleteListener(this.plugin, this.config, this), new VoiceChannelUpdateParentListener(this.plugin, this.config, this),
+                new ConfigureCommand(this.plugin, this.config, this), new InviteCommand(), new LinkCommand(this.config, this), new UnlinkCommand(this.config),
+                new ButtonClickListener(this.plugin, this.config, this), new SelectMenuListener(this.plugin, this.config, this)));
+        Bukkit.getScheduler().runTaskLater(this.plugin, () ->
+                        Bukkit.getScheduler().runTaskTimerAsynchronously(
+                                this.plugin,
+                                new UpdateNetworksTask(this.config)::run,
+                                0,
+                                10
+                        ),
+                0
+        );
+        Bukkit.getScheduler().runTaskLater(this.plugin, () ->
+                        Bukkit.getScheduler().runTaskTimerAsynchronously(
+                                this.plugin,
+                                new UpdateUtil(this.plugin, Skoice.RESSOURCE_ID, LoggerLang.OUTDATED_VERSION_WARNING.toString())::checkVersion,
+                                Bot.TICKS_BETWEEN_VERSION_CHECKING,
+                                Bot.TICKS_BETWEEN_VERSION_CHECKING
+                        ),
+                0
+        );
+        this.retrieveNetworks();
         this.plugin.updateConfigurationStatus(startup);
         if (sender != null && this.jda != null) {
-            if (this.plugin.isBotReady()) {
+            if (this.isReady) {
                 sender.sendMessage(MinecraftLang.BOT_CONNECTED.toString());
             } else {
                 sender.sendMessage(MinecraftLang.BOT_CONNECTED_INCOMPLETE_CONFIGURATION_DISCORD.toString());
@@ -181,25 +198,25 @@ public class Bot {
     }
 
     public void updateGuildUniquenessStatus() {
-        this.plugin.setGuildUnique(this.jda.getGuilds().size() <= 1);
+        this.isOnMultipleGuilds = this.jda.getGuilds().size() > 1;
     }
 
     public void checkForValidLobby() {
-        if (this.config.getLobby() == null && this.config.getFile().contains(Config.LOBBY_ID_FIELD)) {
-            this.config.getFile().set(Config.LOBBY_ID_FIELD, null);
+        if (this.config.getReader().getLobby() == null && this.config.getFile().contains(ConfigField.LOBBY_ID.get())) {
+            this.config.getFile().set(ConfigField.LOBBY_ID.get(), null);
             this.config.saveFile();
         }
     }
 
     public void checkForUnlinkedUsersInLobby() {
-        VoiceChannel lobby = this.config.getLobby();
+        VoiceChannel lobby = this.config.getReader().getLobby();
         if (lobby != null) {
             for (Member member : lobby.getMembers()) {
-                String minecraftID = this.config.getKeyFromValue(this.config.getLinkMap(), member.getId());
+                String minecraftID = new MapUtil().getKeyFromValue(this.config.getReader().getLinkMap(), member.getId());
                 if (minecraftID == null) {
                     EmbedBuilder embed = new EmbedBuilder().setTitle(MenuEmoji.LINK + DiscordLang.LINKING_PROCESS_EMBED_TITLE.toString())
                             .setColor(Color.RED);
-                    Guild guild = this.config.getGuild();
+                    Guild guild = this.config.getReader().getGuild();
                     if (guild != null) {
                         embed.addField(MenuEmoji.WARNING + DiscordLang.ACCOUNT_NOT_LINKED_FIELD_TITLE.toString(),
                                 String.format(DiscordLang.ACCOUNT_NOT_LINKED_FIELD_ALTERNATIVE_DESCRIPTION.toString(), guild.getName()), false);
@@ -216,7 +233,7 @@ public class Bot {
     }
 
     private void retrieveNetworks() {
-        Category category = this.config.getCategory();
+        Category category = this.config.getReader().getCategory();
         if (category != null) {
             category.getVoiceChannels().stream()
                     .filter(channel -> {

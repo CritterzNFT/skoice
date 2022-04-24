@@ -22,6 +22,7 @@ package net.clementraynaud.skoice.listeners.message.guild;
 import net.clementraynaud.skoice.Skoice;
 import net.clementraynaud.skoice.bot.Bot;
 import net.clementraynaud.skoice.config.Config;
+import net.clementraynaud.skoice.config.ConfigField;
 import net.clementraynaud.skoice.listeners.interaction.ButtonClickListener;
 import net.clementraynaud.skoice.menus.Response;
 import net.clementraynaud.skoice.menus.Menu;
@@ -45,9 +46,9 @@ public class GuildMessageReceivedListener extends ListenerAdapter {
         String discordID = event.getAuthor().getId();
         if (discordID.equals(event.getJDA().getSelfUser().getId())) {
             if (!event.getMessage().isEphemeral()) {
-                this.config.getFile().set(Config.TEMP_GUILD_ID_FIELD, event.getGuild().getId());
-                this.config.getFile().set(Config.TEMP_TEXT_CHANNEL_ID_FIELD, event.getChannel().getId());
-                this.config.getFile().set(Config.TEMP_MESSAGE_ID_FIELD, event.getMessageId());
+                this.config.getFile().set(ConfigField.TEMP_GUILD_ID.get(), event.getGuild().getId());
+                this.config.getFile().set(ConfigField.TEMP_TEXT_CHANNEL_ID.get(), event.getChannel().getId());
+                this.config.getFile().set(ConfigField.TEMP_MESSAGE_ID.get(), event.getMessageId());
                 this.config.saveFile();
             }
         } else if (ButtonClickListener.discordIDAxis.containsKey(event.getAuthor().getId())
@@ -60,10 +61,10 @@ public class GuildMessageReceivedListener extends ListenerAdapter {
                 this.config.saveFile();
                 new Response(this.plugin, this.config, this.bot).deleteMessage();
                 Menu.customizeRadius = false;
-                if (ButtonClickListener.discordIDAxis.get(event.getAuthor().getId()).equals(Config.HORIZONTAL_RADIUS_FIELD)) {
+                if (ButtonClickListener.discordIDAxis.get(event.getAuthor().getId()).equals(ConfigField.HORIZONTAL_RADIUS.get())) {
                     Menu.HORIZONTAL_RADIUS.refreshFields();
                     event.getChannel().sendMessage(Menu.HORIZONTAL_RADIUS.getMessage()).queue();
-                } else if (ButtonClickListener.discordIDAxis.get(event.getAuthor().getId()).equals(Config.VERTICAL_RADIUS_FIELD)) {
+                } else if (ButtonClickListener.discordIDAxis.get(event.getAuthor().getId()).equals(ConfigField.VERTICAL_RADIUS.get())) {
                     Menu.VERTICAL_RADIUS.refreshFields();
                     event.getChannel().sendMessage(Menu.VERTICAL_RADIUS.getMessage()).queue();
                 }

@@ -22,6 +22,8 @@ package net.clementraynaud.skoice.lang;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import net.clementraynaud.skoice.config.Config;
+import net.clementraynaud.skoice.config.ConfigField;
+import net.clementraynaud.skoice.config.ConfigReader;
 
 import java.util.Map;
 
@@ -86,7 +88,7 @@ public enum LoggerLang {
 
     @Override
     public String toString() {
-        String lang = Config.getFile().getString(Config.LANG_FIELD);
+        String lang = Config.getFile().getString(ConfigField.LANG.get());
         return this.messages.getOrDefault(lang == null ? Lang.EN : Lang.valueOf(lang), this.messages.get(Lang.EN));
     }
 }

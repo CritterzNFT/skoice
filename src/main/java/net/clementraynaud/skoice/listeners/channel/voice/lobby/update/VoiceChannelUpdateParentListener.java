@@ -22,6 +22,7 @@ package net.clementraynaud.skoice.listeners.channel.voice.lobby.update;
 import net.clementraynaud.skoice.Skoice;
 import net.clementraynaud.skoice.bot.Bot;
 import net.clementraynaud.skoice.config.Config;
+import net.clementraynaud.skoice.config.ConfigField;
 import net.clementraynaud.skoice.menus.Response;
 import net.dv8tion.jda.api.events.channel.voice.update.VoiceChannelUpdateParentEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -40,7 +41,7 @@ public class VoiceChannelUpdateParentListener extends ListenerAdapter {
 
     @Override
     public void onVoiceChannelUpdateParent(VoiceChannelUpdateParentEvent event) {
-        if (event.getChannel().getId().equals(this.config.getFile().getString(Config.LOBBY_ID_FIELD))) {
+        if (event.getChannel().getId().equals(this.config.getFile().getString(ConfigField.LOBBY_ID.get()))) {
             new Response(this.plugin, this.config, this.bot).sendLobbyDeletedAlert(event.getGuild());
         }
     }

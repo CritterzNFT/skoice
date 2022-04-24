@@ -19,17 +19,17 @@
 
 package net.clementraynaud.skoice.util;
 
-import org.bukkit.Location;
-import org.bukkit.util.NumberConversions;
+import java.util.Map;
+import java.util.Objects;
 
-public class DistanceUtil {
+public class MapUtil {
 
-    public double getHorizontalDistance(Location location1, Location location2) {
-        return Math.sqrt(NumberConversions.square(location1.getX() - location2.getX())
-                + NumberConversions.square(location1.getZ() - location2.getZ()));
-    }
-
-    public double getVerticalDistance(Location location1, Location location2) {
-        return Math.abs(location1.getY() - location2.getY());
+    public String getKeyFromValue(Map<String, String> map, String value) {
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            if (Objects.equals(value, entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+        return null;
     }
 }

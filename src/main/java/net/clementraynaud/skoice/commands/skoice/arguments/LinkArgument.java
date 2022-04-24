@@ -23,6 +23,7 @@ import net.clementraynaud.skoice.commands.LinkCommand;
 import net.clementraynaud.skoice.lang.DiscordLang;
 import net.clementraynaud.skoice.lang.MinecraftLang;
 import net.clementraynaud.skoice.menus.MenuEmoji;
+import net.clementraynaud.skoice.util.MapUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
@@ -46,11 +47,11 @@ public class LinkArgument extends Argument {
             return;
         }
         Player player = (Player) this.sender;
-        if (!super.plugin.isBotReady() || super.bot.getJda() == null) {
+        if (!super.bot.isReady() || super.bot.getJda() == null) {
             player.sendMessage(MinecraftLang.INCOMPLETE_CONFIGURATION.toString());
             return;
         }
-        if (super.config.getLinkMap().containsKey(player.getUniqueId().toString())) {
+        if (super.config.getReader().getLinkMap().containsKey(player.getUniqueId().toString())) {
             player.sendMessage(MinecraftLang.ACCOUNT_ALREADY_LINKED.toString());
             return;
         }
@@ -62,15 +63,15 @@ public class LinkArgument extends Argument {
             player.sendMessage(MinecraftLang.INVALID_CODE.toString());
             return;
         }
-        String discordID = super.config.getKeyFromValue(LinkCommand.getDiscordIDCode(), this.arg);
+        String discordID = new MapUtil().getKeyFromValue(LinkCommand.getDiscordIDCode(), this.arg);
         if (discordID == null) {
             return;
         }
-        Member member = super.config.getGuild().getMemberById(discordID);
+        Member member = super.config.getReader().getGuild().getMemberById(discordID);
         if (member == null) {
             return;
         }
-        super.config.linkUser(player.getUniqueId().toString(), discordID);
+        super.config.getUpdater().linkUser(player.getUniqueId().toString(), discordID);
         LinkCommand.removeValueFromDiscordIDCode(this.arg);
         member.getUser().openPrivateChannel().complete()
                 .sendMessageEmbeds(new EmbedBuilder().setTitle(MenuEmoji.LINK + DiscordLang.LINKING_PROCESS_EMBED_TITLE.toString())
@@ -82,7 +83,7 @@ public class LinkArgument extends Argument {
         GuildVoiceState voiceState = member.getVoiceState();
         if (voiceState != null) {
             VoiceChannel voiceChannel = voiceState.getChannel();
-            if (voiceChannel != null && voiceChannel.equals(super.config.getLobby())) {
+            if (voiceChannel != null && voiceChannel.equals(super.config.getReader().getLobby())) {
                 player.sendMessage(MinecraftLang.CONNECTED_TO_PROXIMITY_VOICE_CHAT.toString());
             }
         }

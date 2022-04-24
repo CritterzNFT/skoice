@@ -23,6 +23,7 @@ import net.clementraynaud.skoice.config.Config;
 import net.clementraynaud.skoice.lang.DiscordLang;
 import net.clementraynaud.skoice.lang.MinecraftLang;
 import net.clementraynaud.skoice.menus.MenuEmoji;
+import net.clementraynaud.skoice.util.MapUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.VoiceChannel;
@@ -46,14 +47,14 @@ public class UnlinkCommand extends ListenerAdapter {
     public void onSlashCommand(SlashCommandEvent event) {
         if ("unlink" .equals(event.getName())) {
             EmbedBuilder embed = new EmbedBuilder().setTitle(MenuEmoji.LINK + DiscordLang.LINKING_PROCESS_EMBED_TITLE.toString());
-            String minecraftID = this.config.getKeyFromValue(this.config.getLinkMap(), event.getUser().getId());
+            String minecraftID = new MapUtil().getKeyFromValue(this.config.getReader().getLinkMap(), event.getUser().getId());
             if (minecraftID == null) {
                 event.replyEmbeds(embed.addField(MenuEmoji.WARNING + DiscordLang.ACCOUNT_NOT_LINKED_FIELD_TITLE.toString(),
                                         DiscordLang.ACCOUNT_NOT_LINKED_FIELD_DESCRIPTION.toString(), false)
                                 .setColor(Color.RED).build())
                         .setEphemeral(true).queue();
             } else {
-                this.config.unlinkUser(minecraftID);
+                this.config.getUpdater().unlinkUser(minecraftID);
                 event.replyEmbeds(embed.addField(MenuEmoji.HEAVY_CHECK_MARK + DiscordLang.ACCOUNT_UNLINKED_FIELD_TITLE.toString(),
                                         DiscordLang.ACCOUNT_UNLINKED_FIELD_DESCRIPTION.toString(), false)
                                 .setColor(Color.GREEN).build())
@@ -64,7 +65,7 @@ public class UnlinkCommand extends ListenerAdapter {
                     GuildVoiceState voiceState = event.getMember().getVoiceState();
                     if (voiceState != null) {
                         VoiceChannel voiceChannel = voiceState.getChannel();
-                        if (voiceChannel != null && voiceChannel.equals(this.config.getLobby())) {
+                        if (voiceChannel != null && voiceChannel.equals(this.config.getReader().getLobby())) {
                             player.getPlayer().sendMessage(MinecraftLang.DISCONNECTED_FROM_PROXIMITY_VOICE_CHAT.toString());
                         }
                     }

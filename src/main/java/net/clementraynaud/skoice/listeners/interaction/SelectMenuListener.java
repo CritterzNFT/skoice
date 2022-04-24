@@ -23,6 +23,7 @@ import net.clementraynaud.skoice.Skoice;
 import net.clementraynaud.skoice.bot.Bot;
 import net.clementraynaud.skoice.bot.Commands;
 import net.clementraynaud.skoice.config.Config;
+import net.clementraynaud.skoice.config.ConfigField;
 import net.clementraynaud.skoice.menus.ErrorEmbeds;
 import net.clementraynaud.skoice.menus.Menu;
 import net.clementraynaud.skoice.lang.DiscordLang;
@@ -53,8 +54,8 @@ public class SelectMenuListener extends ListenerAdapter {
     public void onSelectionMenu(SelectionMenuEvent event) {
         Member member = event.getMember();
         if (member != null && member.hasPermission(Permission.MANAGE_SERVER)) {
-            if (this.config.getFile().contains(Config.TEMP_MESSAGE_ID_FIELD)
-                    && this.config.getFile().getString(Config.TEMP_MESSAGE_ID_FIELD).equals(event.getMessageId())
+            if (this.config.getFile().contains(ConfigField.TEMP_MESSAGE_ID.get())
+                    && this.config.getFile().getString(ConfigField.TEMP_MESSAGE_ID.get()).equals(event.getMessageId())
                     && event.getSelectedOptions() != null) {
                 String componentID = event.getComponentId();
                 switch (componentID) {
@@ -73,7 +74,7 @@ public class SelectMenuListener extends ListenerAdapter {
                         }
                         break;
                     case "LANGUAGE_SELECTION":
-                        this.config.getFile().set(Config.LANG_FIELD, event.getSelectedOptions().get(0).getValue());
+                        this.config.getFile().set(ConfigField.LANG.get(), event.getSelectedOptions().get(0).getValue());
                         this.config.saveFile();
                         this.plugin.updateConfigurationStatus(false);
                         new Commands(this.plugin, this.bot).register(event.getGuild());
@@ -87,7 +88,7 @@ public class SelectMenuListener extends ListenerAdapter {
                                         .complete().getId();
                                 String lobbyID = guild.createVoiceChannel(DiscordLang.DEFAULT_LOBBY_NAME.toString(), event.getGuild().getCategoryById(categoryID))
                                         .complete().getId();
-                                this.config.getFile().set(Config.LOBBY_ID_FIELD, lobbyID);
+                                this.config.getFile().set(ConfigField.LOBBY_ID.get(), lobbyID);
                                 this.config.saveFile();
                                 this.plugin.updateConfigurationStatus(false);
                             } else if ("REFRESH" .equals(event.getSelectedOptions().get(0).getValue())) {
@@ -95,7 +96,7 @@ public class SelectMenuListener extends ListenerAdapter {
                             } else {
                                 VoiceChannel lobby = guild.getVoiceChannelById(event.getSelectedOptions().get(0).getValue());
                                 if (lobby != null && lobby.getParent() != null) {
-                                    this.config.getFile().set(Config.LOBBY_ID_FIELD, event.getSelectedOptions().get(0).getValue());
+                                    this.config.getFile().set(ConfigField.LOBBY_ID.get(), event.getSelectedOptions().get(0).getValue());
                                     this.config.saveFile();
                                     this.plugin.updateConfigurationStatus(false);
                                 }
@@ -105,14 +106,14 @@ public class SelectMenuListener extends ListenerAdapter {
                         break;
                     case "MODE_SELECTION":
                         if ("VANILLA_MODE" .equals(event.getSelectedOptions().get(0).getValue())) {
-                            this.config.getFile().set(Config.HORIZONTAL_RADIUS_FIELD, 80);
-                            this.config.getFile().set(Config.VERTICAL_RADIUS_FIELD, 40);
+                            this.config.getFile().set(ConfigField.HORIZONTAL_RADIUS.get(), 80);
+                            this.config.getFile().set(ConfigField.VERTICAL_RADIUS.get(), 40);
                             this.config.saveFile();
                             this.plugin.updateConfigurationStatus(false);
                             event.editMessage(new Response(this.plugin, this.config, this.bot).getMessage()).queue();
                         } else if ("MINIGAME_MODE" .equals(event.getSelectedOptions().get(0).getValue())) {
-                            this.config.getFile().set(Config.HORIZONTAL_RADIUS_FIELD, 40);
-                            this.config.getFile().set(Config.VERTICAL_RADIUS_FIELD, 20);
+                            this.config.getFile().set(ConfigField.HORIZONTAL_RADIUS.get(), 40);
+                            this.config.getFile().set(ConfigField.VERTICAL_RADIUS.get(), 20);
                             this.config.saveFile();
                             this.plugin.updateConfigurationStatus(false);
                             event.editMessage(new Response(this.plugin, this.config, this.bot).getMessage()).queue();
@@ -123,18 +124,18 @@ public class SelectMenuListener extends ListenerAdapter {
                         break;
                     case "ACTION_BAR_ALERT":
                         if ("true" .equals(event.getSelectedOptions().get(0).getValue())) {
-                            this.config.getFile().set(Config.ACTION_BAR_ALERT_FIELD, true);
+                            this.config.getFile().set(ConfigField.ACTION_BAR_ALERT.get(), true);
                         } else if ("false" .equals(event.getSelectedOptions().get(0).getValue())) {
-                            this.config.getFile().set(Config.ACTION_BAR_ALERT_FIELD, false);
+                            this.config.getFile().set(ConfigField.ACTION_BAR_ALERT.get(), false);
                         }
                         this.config.saveFile();
                         event.editMessage(new Response(this.plugin, this.config, this.bot).getMessage()).queue();
                         break;
                     case "CHANNEL_VISIBILITY":
                         if ("true" .equals(event.getSelectedOptions().get(0).getValue())) {
-                            this.config.getFile().set(Config.CHANNEL_VISIBILITY_FIELD, true);
+                            this.config.getFile().set(ConfigField.CHANNEL_VISIBILITY.get(), true);
                         } else if ("false" .equals(event.getSelectedOptions().get(0).getValue())) {
-                            this.config.getFile().set(Config.CHANNEL_VISIBILITY_FIELD, false);
+                            this.config.getFile().set(ConfigField.CHANNEL_VISIBILITY.get(), false);
                         }
                         this.config.saveFile();
                         event.editMessage(new Response(this.plugin, this.config, this.bot).getMessage()).queue();

@@ -21,6 +21,7 @@
 package net.clementraynaud.skoice.system;
 
 import net.clementraynaud.skoice.config.Config;
+import net.clementraynaud.skoice.config.ConfigField;
 import net.clementraynaud.skoice.util.DistanceUtil;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -56,11 +57,11 @@ public class Network {
     }
 
     public void build() {
-        Guild guild = this.config.getGuild();
-        List<Permission> deniedPermissions = this.config.getFile().getBoolean(Config.CHANNEL_VISIBILITY_FIELD)
+        Guild guild = this.config.getReader().getGuild();
+        List<Permission> deniedPermissions = this.config.getFile().getBoolean(ConfigField.CHANNEL_VISIBILITY.get())
                 ? Arrays.asList(Permission.VOICE_CONNECT, Permission.VOICE_MOVE_OTHERS)
                 : Arrays.asList(Permission.VIEW_CHANNEL, Permission.VOICE_MOVE_OTHERS);
-        this.config.getCategory().createVoiceChannel(UUID.randomUUID().toString())
+        this.config.getReader().getCategory().createVoiceChannel(UUID.randomUUID().toString())
                 .addPermissionOverride(guild.getPublicRole(),
                         Arrays.asList(Permission.VOICE_SPEAK, Permission.VOICE_USE_VAD),
                         deniedPermissions)
@@ -75,22 +76,28 @@ public class Network {
     }
 
     public boolean canPlayerBeAdded(Player player) {
+        DistanceUtil distanceUtil = new DistanceUtil();
         return this.players.stream()
                 .map(Bukkit::getPlayer)
                 .filter(Objects::nonNull)
                 .filter(p -> !p.equals(player))
                 .filter(p -> p.getWorld().getName().equals(player.getWorld().getName()))
-                .anyMatch(p -> DistanceUtil.getVerticalDistance(p.getLocation(), player.getLocation()) <= this.config.getVerticalRadius()
-                        && DistanceUtil.getHorizontalDistance(p.getLocation(), player.getLocation()) <= this.config.getHorizontalRadius());
+                .anyMatch(p -> distanceUtil.getVerticalDistance(p.getLocation(), player.getLocation()) <= this.config.getFile()
+                        .getInt(ConfigField.VERTICAL_RADIUS.get())
+                        && distanceUtil.getHorizontalDistance(p.getLocation(), player.getLocation()) <= this.config.getFile()
+                        .getInt(ConfigField.HORIZONTAL_RADIUS.get()));
     }
 
     public boolean canPlayerStayConnected(Player player) {
+        DistanceUtil distanceUtil = new DistanceUtil();
         List<Player> matches = Arrays.asList(this.players.stream()
                 .map(Bukkit::getPlayer)
                 .filter(Objects::nonNull)
                 .filter(p -> p.getWorld().getName().equals(player.getWorld().getName()))
-                .filter(p -> DistanceUtil.getVerticalDistance(p.getLocation(), player.getLocation()) <= this.config.getVerticalRadius() + Network.FALLOFF
-                        && DistanceUtil.getHorizontalDistance(p.getLocation(), player.getLocation()) <= this.config.getHorizontalRadius() + Network.FALLOFF)
+                .filter(p -> distanceUtil.getVerticalDistance(p.getLocation(), player.getLocation()) <= this.config.getFile()
+                        .getInt(ConfigField.VERTICAL_RADIUS.get()) + Network.FALLOFF
+                        && distanceUtil.getHorizontalDistance(p.getLocation(), player.getLocation()) <= this.config.getFile()
+                        .getInt(ConfigField.HORIZONTAL_RADIUS.get()) + Network.FALLOFF)
                 .toArray(Player[]::new));
         if (this.players.size() > matches.size()) {
             Player[] otherPlayers = this.players.stream()
@@ -100,8 +107,10 @@ public class Network {
                     .toArray(Player[]::new);
             for (Player otherPlayer : otherPlayers) {
                 if (matches.stream()
-                        .anyMatch(p -> DistanceUtil.getVerticalDistance(p.getLocation(), otherPlayer.getLocation()) <= this.config.getVerticalRadius() + Network.FALLOFF
-                                && DistanceUtil.getHorizontalDistance(p.getLocation(), otherPlayer.getLocation()) <= this.config.getHorizontalRadius() + Network.FALLOFF)) {
+                        .anyMatch(p -> distanceUtil.getVerticalDistance(p.getLocation(), otherPlayer.getLocation()) <= this.config.getFile()
+                                .getInt(ConfigField.VERTICAL_RADIUS.get()) + Network.FALLOFF
+                                && distanceUtil.getHorizontalDistance(p.getLocation(), otherPlayer.getLocation()) <= this.config.getFile()
+                                .getInt(ConfigField.HORIZONTAL_RADIUS.get()) + Network.FALLOFF)) {
                     return true;
                 }
             }
@@ -152,7 +161,7 @@ public class Network {
         if (this.channel == null || this.channel.isEmpty()) {
             return null;
         }
-        Guild guild = this.config.getGuild();
+        Guild guild = this.config.getReader().getGuild();
         if (guild != null) {
             return guild.getVoiceChannelById(this.channel);
         }

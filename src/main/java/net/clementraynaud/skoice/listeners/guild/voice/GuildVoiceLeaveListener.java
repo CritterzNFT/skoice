@@ -23,6 +23,7 @@ package net.clementraynaud.skoice.listeners.guild.voice;
 import net.clementraynaud.skoice.config.Config;
 import net.clementraynaud.skoice.lang.MinecraftLang;
 import net.clementraynaud.skoice.system.Network;
+import net.clementraynaud.skoice.util.MapUtil;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.bukkit.Bukkit;
@@ -41,10 +42,10 @@ public class GuildVoiceLeaveListener extends ListenerAdapter {
     @Override
     public void onGuildVoiceLeave(GuildVoiceLeaveEvent event) {
         if (event.getChannelLeft().getParent() == null
-                || !event.getChannelLeft().getParent().equals(this.config.getCategory())) {
+                || !event.getChannelLeft().getParent().equals(this.config.getReader().getCategory())) {
             return;
         }
-        String minecraftID = this.config.getKeyFromValue(this.config.getLinkMap(), event.getMember().getId());
+        String minecraftID = new MapUtil().getKeyFromValue(this.config.getReader().getLinkMap(), event.getMember().getId());
         if (minecraftID == null) {
             return;
         }
@@ -53,7 +54,7 @@ public class GuildVoiceLeaveListener extends ListenerAdapter {
             Network.networks.stream()
                     .filter(network -> network.contains(player.getPlayer()))
                     .forEach(network -> network.remove(player.getPlayer()));
-            if (event.getChannelLeft().equals(this.config.getLobby())
+            if (event.getChannelLeft().equals(this.config.getReader().getLobby())
                     || Network.networks.stream().anyMatch(network -> network.getChannel().equals(event.getChannelLeft()))) {
                 player.getPlayer().sendMessage(MinecraftLang.DISCONNECTED_FROM_PROXIMITY_VOICE_CHAT.toString());
             }

@@ -1,6 +1,7 @@
 package net.clementraynaud.skoice.lang;
 
 import net.clementraynaud.skoice.Skoice;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -9,6 +10,8 @@ import java.io.File;
 import java.io.IOException;
 
 public class LangTemp {
+
+    public static final String CHAT_PREFIX = ChatColor.LIGHT_PURPLE + "Skoice " + ChatColor.DARK_GRAY + "• " + ChatColor.GRAY;
 
     private final FileConfiguration englishMessages = new YamlConfiguration();
     private final FileConfiguration messages = new YamlConfiguration();
@@ -20,7 +23,7 @@ public class LangTemp {
     }
 
     public void load(Lang lang) {
-        File englishLangFile = new File(this.plugin.getResource(Lang.EN.name()) + ".yml");
+        File englishLangFile = new File(String.valueOf(this.plugin.getResource("lang" + File.separator + Lang.EN.name() + ".yml")));
         try {
             this.englishMessages.load(englishLangFile);
         } catch (IOException | InvalidConfigurationException ignored) {

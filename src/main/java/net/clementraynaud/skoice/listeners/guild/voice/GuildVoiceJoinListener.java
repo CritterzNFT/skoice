@@ -26,6 +26,7 @@ import net.clementraynaud.skoice.lang.MinecraftLang;
 import net.clementraynaud.skoice.menus.MenuEmoji;
 import net.clementraynaud.skoice.system.EligiblePlayers;
 import net.clementraynaud.skoice.tasks.UpdateVoiceStateTask;
+import net.clementraynaud.skoice.util.MapUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
@@ -48,10 +49,10 @@ public class GuildVoiceJoinListener extends ListenerAdapter {
     @Override
     public void onGuildVoiceJoin(GuildVoiceJoinEvent event) {
         new UpdateVoiceStateTask(this.config, event.getMember(), event.getChannelJoined()).run();
-        if (!event.getChannelJoined().equals(this.config.getLobby())) {
+        if (!event.getChannelJoined().equals(this.config.getReader().getLobby())) {
             return;
         }
-        String minecraftID = this.config.getKeyFromValue(this.config.getLinkMap(), event.getMember().getId());
+        String minecraftID = new MapUtil().getKeyFromValue(this.config.getReader().getLinkMap(), event.getMember().getId());
         if (minecraftID == null) {
             event.getMember().getUser().openPrivateChannel().complete()
                     .sendMessageEmbeds(new EmbedBuilder().setTitle(MenuEmoji.LINK + DiscordLang.LINKING_PROCESS_EMBED_TITLE.toString())

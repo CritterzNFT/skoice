@@ -19,11 +19,11 @@
 
 package net.clementraynaud.skoice.listeners.player;
 
-import net.clementraynaud.skoice.Skoice;
 import net.clementraynaud.skoice.bot.Bot;
+import net.clementraynaud.skoice.config.Config;
+import net.clementraynaud.skoice.config.ConfigField;
 import net.clementraynaud.skoice.lang.MinecraftLang;
 import net.clementraynaud.skoice.util.MessageUtil;
-import net.dv8tion.jda.api.JDA;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -36,11 +36,11 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 public class PlayerJoinListener implements Listener {
 
-    private final Skoice plugin;
+    private final Config config;
     private final Bot bot;
 
-    public PlayerJoinListener(Skoice plugin, Bot bot) {
-        this.plugin = plugin;
+    public PlayerJoinListener(Config config, Bot bot) {
+        this.config = config;
         this.bot = bot;
     }
 
@@ -48,7 +48,7 @@ public class PlayerJoinListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         if (player.isOp()) {
-            if (!this.plugin.isTokenSet() || this.bot.getJda() == null) {
+            if (!this.config.getFile().contains(ConfigField.TOKEN.get()) || this.bot.getJda() == null) {
                 try {
                     TextComponent configureCommand = new TextComponent("§bhere");
                     MessageUtil.setHoverEvent(configureCommand, "§8☀ §bExecute: §7/skoice configure");
@@ -59,7 +59,7 @@ public class PlayerJoinListener implements Listener {
                 } catch (NoSuchMethodError e) {
                     player.sendMessage(MinecraftLang.INCOMPLETE_CONFIGURATION_OPERATOR_COMMAND.toString());
                 }
-            } else if (!this.plugin.isBotReady()) {
+            } else if (!this.bot.isReady()) {
                 player.sendMessage(MinecraftLang.INCOMPLETE_CONFIGURATION_OPERATOR_DISCORD.toString());
             }
         }

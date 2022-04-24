@@ -17,19 +17,29 @@
  * along with Skoice.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.clementraynaud.skoice.util;
+package net.clementraynaud.skoice.config;
 
-import org.bukkit.Location;
-import org.bukkit.util.NumberConversions;
+public enum ConfigField {
+    TOKEN("token"),
+    LANG("lang"),
+    LOBBY_ID("lobby-id"),
+    HORIZONTAL_RADIUS("horizontal-radius"),
+    VERTICAL_RADIUS("vertical-radius"),
+    ACTION_BAR_ALERT("action-bar-alert"),
+    CHANNEL_VISIBILITY("channel-visibility"),
+    LINK_MAP("link-map"),
+    TEMP("temp"),
+    TEMP_MESSAGE_ID(ConfigField.TEMP + ".message-id"),
+    TEMP_TEXT_CHANNEL_ID(ConfigField.TEMP + ".text-channel-id"),
+    TEMP_GUILD_ID(ConfigField.TEMP + ".guild-id");
 
-public class DistanceUtil {
+    private final String field;
 
-    public double getHorizontalDistance(Location location1, Location location2) {
-        return Math.sqrt(NumberConversions.square(location1.getX() - location2.getX())
-                + NumberConversions.square(location1.getZ() - location2.getZ()));
+    ConfigField(String field) {
+        this.field = field;
     }
 
-    public double getVerticalDistance(Location location1, Location location2) {
-        return Math.abs(location1.getY() - location2.getY());
+    public String get() {
+        return this.field;
     }
 }

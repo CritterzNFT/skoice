@@ -19,7 +19,7 @@
 
 package net.clementraynaud.skoice.menus.selectmenus;
 
-import net.clementraynaud.skoice.config.Config;
+import net.clementraynaud.skoice.config.ConfigField;
 import net.clementraynaud.skoice.menus.Menu;
 import net.clementraynaud.skoice.lang.DiscordLang;
 import net.clementraynaud.skoice.lang.Lang;
@@ -46,10 +46,10 @@ public class LanguageSelectMenu extends SelectMenu {
                             : null)
                     .withEmoji(lang.getEmoji()));
         }
-        if (super.plugin.isBotReady()) {
+        if (super.bot.isReady()) {
             return SelectionMenu.create(Menu.LANGUAGE.name() + "_SELECTION")
                     .addOptions(options)
-                    .setDefaultValues(Collections.singleton(super.config.getFile().getString(Config.LANG_FIELD))).build();
+                    .setDefaultValues(Collections.singleton(super.config.getFile().getString(ConfigField.LANG.get()))).build();
         } else {
             return SelectionMenu.create(Menu.LANGUAGE.name() + "_SELECTION")
                     .setPlaceholder(DiscordLang.LANGUAGE_SELECT_MENU_PLACEHOLDER.toString())

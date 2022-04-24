@@ -22,6 +22,7 @@ package net.clementraynaud.skoice.listeners.channel.voice.lobby;
 import net.clementraynaud.skoice.Skoice;
 import net.clementraynaud.skoice.bot.Bot;
 import net.clementraynaud.skoice.config.Config;
+import net.clementraynaud.skoice.config.ConfigField;
 import net.clementraynaud.skoice.menus.Response;
 import net.dv8tion.jda.api.events.channel.voice.VoiceChannelDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -40,7 +41,7 @@ public class VoiceChannelDeleteListener extends ListenerAdapter {
 
     @Override
     public void onVoiceChannelDelete(VoiceChannelDeleteEvent event) {
-        if (event.getChannel().getId().equals(this.config.getFile().getString(Config.LOBBY_ID_FIELD))) {
+        if (event.getChannel().getId().equals(this.config.getFile().getString(ConfigField.LOBBY_ID.get()))) {
             new Response(this.plugin, this.config, this.bot).sendLobbyDeletedAlert(event.getGuild());
         }
     }

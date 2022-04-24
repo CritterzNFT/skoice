@@ -21,11 +21,13 @@
 package net.clementraynaud.skoice.tasks;
 
 import net.clementraynaud.skoice.config.Config;
+import net.clementraynaud.skoice.config.ConfigField;
 import net.clementraynaud.skoice.lang.DiscordLang;
 import net.clementraynaud.skoice.system.EligiblePlayers;
 import net.clementraynaud.skoice.system.Network;
 import net.clementraynaud.skoice.lang.MinecraftLang;
 import net.clementraynaud.skoice.util.DistanceUtil;
+import net.clementraynaud.skoice.util.MapUtil;
 import net.clementraynaud.skoice.util.PlayerUtil;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -58,7 +60,7 @@ public class UpdateNetworksTask implements Task {
             return;
         }
         try {
-            VoiceChannel lobby = this.config.getLobby();
+            VoiceChannel lobby = this.config.getReader().getLobby();
             if (lobby == null) {
                 return;
             }
@@ -70,11 +72,11 @@ public class UpdateNetworksTask implements Task {
             for (UUID minecraftID : oldEligiblePlayers) {
                 Player player = Bukkit.getPlayer(minecraftID);
                 if (player != null) {
-                    Member member = this.config.getMember(player.getUniqueId());
+                    Member member = this.config.getReader().getMember(player.getUniqueId());
                     if (member != null && member.getVoiceState() != null && member.getVoiceState().getChannel() != null) {
                         VoiceChannel playerChannel = member.getVoiceState().getChannel();
-                        boolean isLobby = playerChannel == this.config.getLobby();
-                        if (!isLobby && (playerChannel.getParent() == null || playerChannel.getParent() != this.config.getCategory())) {
+                        boolean isLobby = playerChannel == this.config.getReader().getLobby();
+                        if (!isLobby && (playerChannel.getParent() == null || playerChannel.getParent() != this.config.getReader().getCategory())) {
                             Pair<String, CompletableFuture<Void>> pair = UpdateNetworksTask.awaitingMoves.get(member.getId());
                             if (pair != null) {
                                 pair.getRight().cancel(false);
@@ -82,7 +84,7 @@ public class UpdateNetworksTask implements Task {
                             continue;
                         }
                         this.updateNetworksAroundPlayer(player);
-                        if (this.config.getActionBarAlert()) {
+                        if (this.config.getFile().getBoolean(ConfigField.ACTION_BAR_ALERT.get())) {
                             this.sendActionBarAlert(player);
                         }
                         this.createNetworkIfNeeded(player);
@@ -98,7 +100,7 @@ public class UpdateNetworksTask implements Task {
                 membersInLobby.addAll(voiceChannel.getMembers());
             }
             for (Member member : membersInLobby) {
-                String minecraftID = this.config.getKeyFromValue(this.config.getLinkMap(), member.getId());
+                String minecraftID = new MapUtil().getKeyFromValue(this.config.getReader().getLinkMap(), member.getId());
                 VoiceChannel playerChannel = member.getVoiceState().getChannel();
                 Network playerNetwork = minecraftID != null ? Network.networks.stream()
                         .filter(n -> n.contains(UUID.fromString(minecraftID)))
@@ -123,7 +125,7 @@ public class UpdateNetworksTask implements Task {
                 if (playerChannel != shouldBeInChannel) {
                     UpdateNetworksTask.awaitingMoves.put(member.getId(), Pair.of(
                             shouldBeInChannel.getId(),
-                            this.config.getGuild().moveVoiceMember(member, shouldBeInChannel)
+                            this.config.getReader().getGuild().moveVoiceMember(member, shouldBeInChannel)
                                     .submit().whenCompleteAsync((v, t) -> UpdateNetworksTask.awaitingMoves.remove(member.getId()))
                     ));
                 }
@@ -175,18 +177,19 @@ public class UpdateNetworksTask implements Task {
     }
 
     private void createNetworkIfNeeded(Player player) {
-        Set<Player> alivePlayers = PlayerUtil.getOnlinePlayers().stream()
+        DistanceUtil distanceUtil = new DistanceUtil();
+        Set<Player> alivePlayers = new PlayerUtil().getOnlinePlayers().stream()
                 .filter(p -> !p.isDead())
                 .collect(Collectors.toSet());
-        Category category = this.config.getCategory();
+        Category category = this.config.getReader().getCategory();
         Set<UUID> playersWithinRange = alivePlayers.stream()
                 .filter(p -> Network.networks.stream().noneMatch(network -> network.contains(p)))
                 .filter(p -> !p.equals(player))
                 .filter(p -> p.getWorld().getName().equals(player.getWorld().getName()))
-                .filter(p -> DistanceUtil.getHorizontalDistance(p.getLocation(), player.getLocation()) <= this.config.getHorizontalRadius()
-                        && DistanceUtil.getVerticalDistance(p.getLocation(), player.getLocation()) <= this.config.getVerticalRadius())
+                .filter(p -> distanceUtil.getHorizontalDistance(p.getLocation(), player.getLocation()) <= this.config.getFile().getInt(ConfigField.HORIZONTAL_RADIUS.get())
+                        && distanceUtil.getVerticalDistance(p.getLocation(), player.getLocation()) <= this.config.getFile().getInt(ConfigField.VERTICAL_RADIUS.get()))
                 .filter(p -> {
-                    Member m = this.config.getMember(p.getUniqueId());
+                    Member m = this.config.getReader().getMember(p.getUniqueId());
                     return m != null && m.getVoiceState() != null
                             && m.getVoiceState().getChannel() != null
                             && m.getVoiceState().getChannel().getParent() != null

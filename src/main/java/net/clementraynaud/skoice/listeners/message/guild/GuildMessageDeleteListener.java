@@ -20,6 +20,7 @@
 package net.clementraynaud.skoice.listeners.message.guild;
 
 import net.clementraynaud.skoice.config.Config;
+import net.clementraynaud.skoice.config.ConfigField;
 import net.clementraynaud.skoice.listeners.interaction.ButtonClickListener;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -35,9 +36,9 @@ public class GuildMessageDeleteListener extends ListenerAdapter {
 
     @Override
     public void onGuildMessageDelete(@NotNull GuildMessageDeleteEvent event) {
-        if (this.config.getFile().contains(Config.TEMP_FIELD)
-                && event.getMessageId().equals(this.config.getFile().getString(Config.TEMP_MESSAGE_ID_FIELD))) {
-            this.config.getFile().set(Config.TEMP_FIELD, null);
+        if (this.config.getFile().contains(ConfigField.TEMP.get())
+                && event.getMessageId().equals(this.config.getFile().getString(ConfigField.TEMP_MESSAGE_ID.get()))) {
+            this.config.getFile().set(ConfigField.TEMP.get(), null);
             this.config.saveFile();
             ButtonClickListener.discordIDAxis.clear();
         }

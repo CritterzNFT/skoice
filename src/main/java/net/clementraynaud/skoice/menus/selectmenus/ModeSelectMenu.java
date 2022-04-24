@@ -19,6 +19,7 @@
 
 package net.clementraynaud.skoice.menus.selectmenus;
 
+import net.clementraynaud.skoice.config.ConfigField;
 import net.clementraynaud.skoice.menus.Menu;
 import net.clementraynaud.skoice.menus.MenuEmoji;
 import net.clementraynaud.skoice.lang.DiscordLang;
@@ -48,17 +49,17 @@ public class ModeSelectMenu extends SelectMenu {
                 SelectOption.of(DiscordLang.MINIGAME_MODE_FIELD_TITLE.toString(), ModeSelectMenu.MINIGAME_MODE_ID)
                         .withDescription(DiscordLang.MINIGAME_MODE_SELECT_MENU_DESCRIPTION.toString())
                         .withEmoji(MenuEmoji.CROSSED_SWORDS.getEmojiFromUnicode())));
-        if (super.plugin.isBotReady()) {
+        if (super.bot.isReady()) {
             String defaultValue;
-            if (super.config.getHorizontalRadius() == 80
-                    && super.config.getVerticalRadius() == 40
+            if (super.config.getFile().getInt(ConfigField.HORIZONTAL_RADIUS.get()) == 80
+                    && super.config.getFile().getInt(ConfigField.VERTICAL_RADIUS.get()) == 40
                     && !Menu.customizeRadius) {
                 defaultValue = ModeSelectMenu.VANILLA_MODE_ID;
                 modes.add(SelectOption.of(DiscordLang.CUSTOMIZE_FIELD_TITLE.toString(), ModeSelectMenu.CUSTOMIZE_ID)
                         .withDescription(DiscordLang.CUSTOMIZE_SELECT_MENU_DESCRIPTION.toString())
                         .withEmoji(MenuEmoji.PENCIL2.getEmojiFromUnicode()));
-            } else if (super.config.getHorizontalRadius() == 40
-                    && super.config.getVerticalRadius() == 20
+            } else if (super.config.getFile().getInt(ConfigField.HORIZONTAL_RADIUS.get()) == 40
+                    && super.config.getFile().getInt(ConfigField.VERTICAL_RADIUS.get()) == 20
                     && !Menu.customizeRadius) {
                 defaultValue = ModeSelectMenu.MINIGAME_MODE_ID;
                 modes.add(SelectOption.of(DiscordLang.CUSTOMIZE_FIELD_TITLE.toString(), ModeSelectMenu.CUSTOMIZE_ID)
@@ -68,8 +69,8 @@ public class ModeSelectMenu extends SelectMenu {
                 defaultValue = ModeSelectMenu.CUSTOMIZE_ID;
                 modes.add(SelectOption.of(DiscordLang.CUSTOMIZE_FIELD_TITLE.toString(), ModeSelectMenu.CUSTOMIZE_ID)
                         .withDescription(String.format(DiscordLang.CUSTOMIZE_SELECT_MENU_ALTERNATIVE_DESCRIPTION.toString(),
-                                super.config.getHorizontalRadius(),
-                                super.config.getVerticalRadius()))
+                                super.config.getFile().getInt(ConfigField.HORIZONTAL_RADIUS.get()),
+                                super.config.getFile().getInt(ConfigField.VERTICAL_RADIUS.get())))
                         .withEmoji(MenuEmoji.PENCIL2.getEmojiFromUnicode()));
             }
             return SelectionMenu.create(Menu.MODE.name() + "_SELECTION")

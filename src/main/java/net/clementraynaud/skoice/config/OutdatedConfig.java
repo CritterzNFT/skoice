@@ -50,7 +50,7 @@ public class OutdatedConfig {
                 return;
             }
             this.convertOldToken();
-            this.convertOldData("mainVoiceChannelID", Config.LOBBY_ID_FIELD);
+            this.convertOldData("mainVoiceChannelID", ConfigField.LOBBY_ID.get());
             this.convertOldRadius();
             this.convertOldLinks();
             this.config.saveFile();
@@ -64,22 +64,22 @@ public class OutdatedConfig {
     private void convertOldToken() {
         if (this.oldData.contains("token")
                 && !this.oldData.getString("token").isEmpty()
-                && !this.config.getFile().contains(Config.TOKEN_FIELD)) {
-            this.config.setToken(this.oldData.getString("token"));
+                && !this.config.getFile().contains(ConfigField.TOKEN.get())) {
+            this.config.getUpdater().setToken(this.oldData.getString("token"));
         }
     }
 
     private void convertOldRadius() {
         if (this.oldData.contains("distance.type")
                 && "custom" .equals(this.oldData.getString("distance.type"))) {
-            this.convertOldData("distance.horizontalStrength", Config.HORIZONTAL_RADIUS_FIELD);
-            this.convertOldData("distance.verticalStrength", Config.VERTICAL_RADIUS_FIELD);
+            this.convertOldData("distance.horizontalStrength", ConfigField.HORIZONTAL_RADIUS.get());
+            this.convertOldData("distance.verticalStrength", ConfigField.VERTICAL_RADIUS.get());
         } else {
-            if (!this.config.getFile().contains(Config.HORIZONTAL_RADIUS_FIELD)) {
-                this.config.getFile().set(Config.HORIZONTAL_RADIUS_FIELD, 80);
+            if (!this.config.getFile().contains(ConfigField.HORIZONTAL_RADIUS.get())) {
+                this.config.getFile().set(ConfigField.HORIZONTAL_RADIUS.get(), 80);
             }
-            if (!this.config.getFile().contains(Config.VERTICAL_RADIUS_FIELD)) {
-                this.config.getFile().set(Config.VERTICAL_RADIUS_FIELD, 40);
+            if (!this.config.getFile().contains(ConfigField.VERTICAL_RADIUS.get())) {
+                this.config.getFile().set(ConfigField.VERTICAL_RADIUS.get(), 40);
             }
         }
     }
@@ -92,8 +92,8 @@ public class OutdatedConfig {
             for (int i = 0; i < subkeys.size(); i += 2) {
                 linkMap.put(iterator.next(), iterator.next());
             }
-            linkMap.putAll(this.config.getLinkMap());
-            this.config.getFile().set(Config.LINK_MAP_FIELD, linkMap);
+            linkMap.putAll(this.config.getReader().getLinkMap());
+            this.config.getFile().set(ConfigField.LINK_MAP.get(), linkMap);
         }
     }
 

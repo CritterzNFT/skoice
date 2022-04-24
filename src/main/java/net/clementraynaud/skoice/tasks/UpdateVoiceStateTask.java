@@ -40,16 +40,16 @@ public class UpdateVoiceStateTask implements Task {
 
     @Override
     public void run() {
-        if (this.member.getVoiceState() == null || this.config.getLobby() == null) {
+        if (this.member.getVoiceState() == null || this.config.getReader().getLobby() == null) {
             return;
         }
-        boolean isLobby = this.channel.getId().equals(this.config.getLobby().getId());
+        boolean isLobby = this.channel.getId().equals(this.config.getReader().getLobby().getId());
         if (isLobby && !this.member.getVoiceState().isGuildMuted()) {
             PermissionOverride override = this.channel.getPermissionOverride(this.channel.getGuild().getPublicRole());
             if (override != null && override.getDenied().contains(Permission.VOICE_SPEAK)
                     && this.member.hasPermission(this.channel, Permission.VOICE_SPEAK, Permission.VOICE_MUTE_OTHERS)
                     && this.channel.getGuild().getSelfMember().hasPermission(this.channel, Permission.VOICE_MUTE_OTHERS)
-                    && this.channel.getGuild().getSelfMember().hasPermission(this.config.getCategory(), Permission.VOICE_MOVE_OTHERS)) {
+                    && this.channel.getGuild().getSelfMember().hasPermission(this.config.getReader().getCategory(), Permission.VOICE_MOVE_OTHERS)) {
                 this.member.mute(true).queue();
                 Network.mutedUsers.add(this.member.getId());
             }
