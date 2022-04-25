@@ -21,8 +21,6 @@ package net.clementraynaud.skoice.menus;
 
 import net.clementraynaud.skoice.Skoice;
 import net.clementraynaud.skoice.config.Config;
-import net.clementraynaud.skoice.lang.DiscordLang;
-import net.clementraynaud.skoice.lang.LoggerLang;
 import net.clementraynaud.skoice.menus.selectmenus.LanguageSelectMenu;
 import net.clementraynaud.skoice.menus.selectmenus.LobbySelectMenu;
 import net.clementraynaud.skoice.menus.selectmenus.ModeSelectMenu;

@@ -24,6 +24,7 @@ import net.clementraynaud.skoice.commands.ConfigureCommand;
 import net.clementraynaud.skoice.commands.InviteCommand;
 import net.clementraynaud.skoice.config.Config;
 import net.clementraynaud.skoice.config.ConfigField;
+import net.clementraynaud.skoice.lang.LangFile;
 import net.clementraynaud.skoice.listeners.interaction.ButtonClickListener;
 import net.clementraynaud.skoice.menus.MenuEmoji;
 import net.clementraynaud.skoice.menus.Response;
@@ -35,9 +36,6 @@ import net.clementraynaud.skoice.listeners.guild.GuildJoinListener;
 import net.clementraynaud.skoice.listeners.guild.GuildLeaveListener;
 import net.clementraynaud.skoice.listeners.message.guild.GuildMessageDeleteListener;
 import net.clementraynaud.skoice.listeners.message.guild.GuildMessageReceivedListener;
-import net.clementraynaud.skoice.lang.LoggerLang;
-import net.clementraynaud.skoice.lang.DiscordLang;
-import net.clementraynaud.skoice.lang.MinecraftLang;
 import net.clementraynaud.skoice.commands.LinkCommand;
 import net.clementraynaud.skoice.commands.UnlinkCommand;
 import net.clementraynaud.skoice.listeners.message.priv.PrivateMessageReceivedListener;
@@ -49,7 +47,11 @@ import net.clementraynaud.skoice.util.UpdateUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Category;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Icon;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.requests.ErrorResponse;
@@ -63,10 +65,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
 import javax.security.auth.login.LoginException;
-import java.awt.*;
+import java.awt.Color;
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.UUID;
 
 public class Bot {
 
@@ -78,10 +82,12 @@ public class Bot {
 
     private final Skoice plugin;
     private final Config config;
+    private final LangFile lang;
 
-    public Bot(Skoice plugin, Config config) {
+    public Bot(Skoice plugin, Config config, LangFile lang) {
         this.plugin = plugin;
         this.config = config;
+        this.lang = lang;
     }
 
     public JDA getJda() {
@@ -112,12 +118,12 @@ public class Bot {
                         .setMemberCachePolicy(MemberCachePolicy.ALL)
                         .build()
                         .awaitReady();
-                this.plugin.getLogger().info(LoggerLang.BOT_CONNECTED_INFO.toString());
+                this.plugin.getLogger().info(this.lang.getMessage("logger.info.bot-connected"));
             } catch (LoginException e) {
                 if (sender == null) {
-                    this.plugin.getLogger().severe(LoggerLang.BOT_COULD_NOT_CONNECT_ERROR.toString());
+                    this.plugin.getLogger().severe(this.lang.getMessage("logger.error.bot-could-not-connect"));
                 } else {
-                    sender.sendMessage(MinecraftLang.BOT_COULD_NOT_CONNECT.toString());
+                    sender.sendMessage(this.lang.getMessage("minecraft.chat.configuration.bot-could-not-connect"));
                     this.config.getFile().set(ConfigField.TOKEN.get(), null);
                     this.config.saveFile();
                 }
@@ -125,7 +131,7 @@ public class Bot {
 
             } catch (ErrorResponseException e) {
                 if (sender == null) {
-                    this.plugin.getLogger().severe(LoggerLang.DISCORD_API_TIMED_OUT_ERROR.toString());
+                    this.plugin.getLogger().severe(this.lang.getMessage("logger.error.discord-api-timed-out"));
                 } else {
                     try {
                         TextComponent discordStatusPage = new TextComponent("§bpage");
@@ -135,7 +141,7 @@ public class Bot {
                                 .append(discordStatusPage)
                                 .append("§7.").event((HoverEvent) null).create());
                     } catch (NoSuchMethodError e2) {
-                        sender.sendMessage(MinecraftLang.DISCORD_API_TIMED_OUT_LINK.toString());
+                        sender.sendMessage(this.lang.getMessage("minecraft.chat.error.discord-api-timed-out-link"));
                     }
                 }
             } catch (InterruptedException e) {
@@ -146,21 +152,21 @@ public class Bot {
 
     public void setup(boolean startup, CommandSender sender) {
         this.setDefaultAvatar();
-        new Response(this.plugin, this.config, this).deleteMessage();
+        new Response(this.plugin, this.config, this.lang, this).deleteMessage();
         this.updateGuildUniquenessStatus();
         this.checkForValidLobby();
         this.checkForUnlinkedUsersInLobby();
-        this.jda.getGuilds().forEach(new Commands(this.plugin, this)::register);
-        this.jda.addEventListener(Arrays.asList(new ReconnectedListener(this.plugin, this.config, this), new GuildJoinListener(this.plugin, this),
-                new GuildLeaveListener(this.plugin, this), new PrivateMessageReceivedListener(),
-                new GuildMessageReceivedListener(this.plugin, this.config, this), new GuildMessageDeleteListener(this.config),
-                new VoiceChannelDeleteListener(this.plugin, this.config, this), new VoiceChannelUpdateParentListener(this.plugin, this.config, this),
-                new ConfigureCommand(this.plugin, this.config, this), new InviteCommand(), new LinkCommand(this.config, this), new UnlinkCommand(this.config),
-                new ButtonClickListener(this.plugin, this.config, this), new SelectMenuListener(this.plugin, this.config, this)));
+        this.jda.getGuilds().forEach(new Commands(this.plugin, this.lang, this)::register);
+        this.jda.addEventListener(Arrays.asList(new ReconnectedListener(this.plugin, this.config, this.lang, this), new GuildJoinListener(this.plugin, this.lang, this),
+                new GuildLeaveListener(this.plugin, this), new PrivateMessageReceivedListener(this.lang),
+                new GuildMessageReceivedListener(this.plugin, this.config, this.lang, this), new GuildMessageDeleteListener(this.config),
+                new VoiceChannelDeleteListener(this.plugin, this.config, this.lang, this), new VoiceChannelUpdateParentListener(this.plugin, this.config, this.lang, this),
+                new ConfigureCommand(this.plugin, this.config, this.lang, this), new InviteCommand(this.lang), new LinkCommand(this.config, this.lang, this), new UnlinkCommand(this.config, this.lang),
+                new ButtonClickListener(this.plugin, this.config, this.lang, this), new SelectMenuListener(this.plugin, this.config, this.lang, this)));
         Bukkit.getScheduler().runTaskLater(this.plugin, () ->
                         Bukkit.getScheduler().runTaskTimerAsynchronously(
                                 this.plugin,
-                                new UpdateNetworksTask(this.config)::run,
+                                new UpdateNetworksTask(this.config, this.lang)::run,
                                 0,
                                 10
                         ),
@@ -169,7 +175,7 @@ public class Bot {
         Bukkit.getScheduler().runTaskLater(this.plugin, () ->
                         Bukkit.getScheduler().runTaskTimerAsynchronously(
                                 this.plugin,
-                                new UpdateUtil(this.plugin, Skoice.RESSOURCE_ID, LoggerLang.OUTDATED_VERSION_WARNING.toString())::checkVersion,
+                                new UpdateUtil(this.plugin, Skoice.RESSOURCE_ID, this.lang.getMessage("logger.warning.outdated-version"))::checkVersion,
                                 Bot.TICKS_BETWEEN_VERSION_CHECKING,
                                 Bot.TICKS_BETWEEN_VERSION_CHECKING
                         ),
@@ -179,9 +185,9 @@ public class Bot {
         this.plugin.updateConfigurationStatus(startup);
         if (sender != null && this.jda != null) {
             if (this.isReady) {
-                sender.sendMessage(MinecraftLang.BOT_CONNECTED.toString());
+                sender.sendMessage(this.lang.getMessage("minecraft.chat.configuration.bot-connected"));
             } else {
-                sender.sendMessage(MinecraftLang.BOT_CONNECTED_INCOMPLETE_CONFIGURATION_DISCORD.toString());
+                sender.sendMessage(this.lang.getMessage("minecraft.chat.configuration.bot-connected-incomplete-configuration-discord"));
             }
         }
     }
@@ -214,15 +220,15 @@ public class Bot {
             for (Member member : lobby.getMembers()) {
                 String minecraftID = new MapUtil().getKeyFromValue(this.config.getReader().getLinkMap(), member.getId());
                 if (minecraftID == null) {
-                    EmbedBuilder embed = new EmbedBuilder().setTitle(MenuEmoji.LINK + DiscordLang.LINKING_PROCESS_EMBED_TITLE.toString())
+                    EmbedBuilder embed = new EmbedBuilder().setTitle(MenuEmoji.LINK + this.lang.getMessage("discord.menu.linking-process.title"))
                             .setColor(Color.RED);
                     Guild guild = this.config.getReader().getGuild();
                     if (guild != null) {
-                        embed.addField(MenuEmoji.WARNING + DiscordLang.ACCOUNT_NOT_LINKED_FIELD_TITLE.toString(),
-                                String.format(DiscordLang.ACCOUNT_NOT_LINKED_FIELD_ALTERNATIVE_DESCRIPTION.toString(), guild.getName()), false);
+                        embed.addField(MenuEmoji.WARNING + this.lang.getMessage("discord.menu.linking-process.field.account-not-linked.title"),
+                                this.lang.getMessage("discord.menu.linking-process.field.account-not-linked.alternative-description", guild.getName()), false);
                     } else {
-                        embed.addField(MenuEmoji.WARNING + DiscordLang.ACCOUNT_NOT_LINKED_FIELD_TITLE.toString(),
-                                DiscordLang.ACCOUNT_NOT_LINKED_FIELD_GENERIC_ALTERNATIVE_DESCRIPTION.toString(), false);
+                        embed.addField(MenuEmoji.WARNING + this.lang.getMessage("discord.menu.linking-process.field.account-not-linked.title"),
+                                this.lang.getMessage("discord.menu.linking-process.field.account-not-linked.generic-alternative-description"), false);
                     }
                     member.getUser().openPrivateChannel().complete()
                             .sendMessageEmbeds(embed.build())

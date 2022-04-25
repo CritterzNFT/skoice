@@ -20,7 +20,6 @@
 package net.clementraynaud.skoice.commands.skoice.arguments;
 
 import net.clementraynaud.skoice.Skoice;
-import net.clementraynaud.skoice.lang.MinecraftLang;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -92,11 +91,11 @@ public abstract class Argument extends Skoice {
 
     protected boolean canExecuteCommand() {
         if (!(this.sender instanceof Player) && !this.allowsConsole) {
-            this.sender.sendMessage(MinecraftLang.ILLEGAL_EXECUTOR.toString());
+            this.sender.sendMessage(super.lang.getMessage("minecraft.chat.error.illegal-executor"));
             return false;
         }
         if (!this.sender.isOp() && this.restrictedToOperators) {
-            this.sender.sendMessage(MinecraftLang.MISSING_PERMISSION.toString());
+            this.sender.sendMessage(super.lang.getMessage("minecraft.chat.error.missing-permission"));
             return false;
         }
         return true;

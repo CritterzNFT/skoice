@@ -22,9 +22,9 @@ package net.clementraynaud.skoice.commands;
 import net.clementraynaud.skoice.Skoice;
 import net.clementraynaud.skoice.bot.Bot;
 import net.clementraynaud.skoice.config.Config;
-import net.clementraynaud.skoice.menus.ErrorEmbeds;
+import net.clementraynaud.skoice.lang.LangFile;
+import net.clementraynaud.skoice.menus.ErrorEmbed;
 import net.clementraynaud.skoice.menus.Response;
-import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -39,11 +39,13 @@ public class ConfigureCommand extends ListenerAdapter {
 
     private final Skoice plugin;
     private final Config config;
+    private final LangFile lang;
     private final Bot bot;
 
-    public ConfigureCommand(Skoice plugin, Config config, Bot bot) {
+    public ConfigureCommand(Skoice plugin, Config config, LangFile lang, Bot bot) {
         this.plugin = plugin;
         this.config = config;
+        this.lang = lang;
         this.bot = bot;
     }
 
@@ -53,9 +55,9 @@ public class ConfigureCommand extends ListenerAdapter {
             Member member = event.getMember();
             if (member != null && member.hasPermission(Permission.MANAGE_SERVER)) {
                 if (this.configureCommandCooldown) {
-                    event.replyEmbeds(ErrorEmbeds.getTooManyInteractionsEmbed()).setEphemeral(true).queue();
+                    event.replyEmbeds(new ErrorEmbed(this.lang).getTooManyInteractionsEmbed()).setEphemeral(true).queue();
                 } else {
-                    Response response = new Response(this.plugin, this.config, this.bot);
+                    Response response = new Response(this.plugin, this.config, this.lang, this.bot);
                     response.deleteMessage();
                     event.reply(response.getMessage()).queue();
                     this.configureCommandCooldown = true;
@@ -68,7 +70,7 @@ public class ConfigureCommand extends ListenerAdapter {
                     }, 5000);
                 }
             } else {
-                event.replyEmbeds(ErrorEmbeds.getAccessDeniedEmbed()).setEphemeral(true).queue();
+                event.replyEmbeds(new ErrorEmbed(this.lang).getAccessDeniedEmbed()).setEphemeral(true).queue();
             }
         }
     }

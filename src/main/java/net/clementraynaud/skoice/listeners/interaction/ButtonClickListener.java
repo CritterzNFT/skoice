@@ -23,9 +23,9 @@ import net.clementraynaud.skoice.Skoice;
 import net.clementraynaud.skoice.bot.Bot;
 import net.clementraynaud.skoice.config.Config;
 import net.clementraynaud.skoice.config.ConfigField;
-import net.clementraynaud.skoice.menus.ErrorEmbeds;
+import net.clementraynaud.skoice.lang.LangFile;
+import net.clementraynaud.skoice.menus.ErrorEmbed;
 import net.clementraynaud.skoice.menus.Menu;
-import net.clementraynaud.skoice.lang.DiscordLang;
 import net.clementraynaud.skoice.menus.MenuEmoji;
 import net.clementraynaud.skoice.menus.Response;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -42,11 +42,13 @@ public class ButtonClickListener extends ListenerAdapter {
 
     private final Skoice plugin;
     private final Config config;
+    private final LangFile lang;
     private final Bot bot;
 
-    public ButtonClickListener(Skoice plugin, Config config, Bot bot) {
+    public ButtonClickListener(Skoice plugin, Config config, LangFile lang, Bot bot) {
         this.plugin = plugin;
         this.config = config;
+        this.lang = lang;
         this.bot = bot;
     }
 
@@ -64,14 +66,14 @@ public class ButtonClickListener extends ListenerAdapter {
                     event.getMessage().delete().queue();
                     if (!this.bot.isReady()) {
                         event.replyEmbeds(new EmbedBuilder()
-                                        .setTitle(MenuEmoji.GEAR + DiscordLang.CONFIGURATION_EMBED_TITLE.toString())
-                                        .addField(MenuEmoji.WARNING + DiscordLang.INCOMPLETE_CONFIGURATION_FIELD_TITLE.toString(),
-                                                DiscordLang.INCOMPLETE_CONFIGURATION_SERVER_MANAGER_FIELD_DESCRIPTION.toString(), false)
+                                        .setTitle(MenuEmoji.GEAR + this.lang.getMessage("discord.menu.configuration.title"))
+                                        .addField(MenuEmoji.WARNING + this.lang.getMessage("discord.field.incomplete-configuration.title"),
+                                                this.lang.getMessage("discord.field.incomplete-configuration.server-manager-description"), false)
                                         .setColor(Color.RED).build())
                                 .setEphemeral(true).queue();
                     }
                 } else if (!this.bot.isReady()) {
-                    event.editMessage(new Response(this.plugin, this.config, this.bot).getMessage()).queue();
+                    event.editMessage(new Response(this.plugin, this.config, this.lang, this.bot).getMessage()).queue();
                 } else {
                     if (buttonID.equals(Menu.MODE.name())) {
                         ButtonClickListener.discordIDAxis.remove(member.getId());
@@ -84,7 +86,7 @@ public class ButtonClickListener extends ListenerAdapter {
                 }
             }
         } else {
-            event.replyEmbeds(ErrorEmbeds.getAccessDeniedEmbed()).setEphemeral(true).queue();
+            event.replyEmbeds(new ErrorEmbed(this.lang).getAccessDeniedEmbed()).setEphemeral(true).queue();
         }
     }
 }

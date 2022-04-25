@@ -22,10 +22,9 @@ package net.clementraynaud.skoice.tasks;
 
 import net.clementraynaud.skoice.config.Config;
 import net.clementraynaud.skoice.config.ConfigField;
-import net.clementraynaud.skoice.lang.DiscordLang;
+import net.clementraynaud.skoice.lang.LangFile;
 import net.clementraynaud.skoice.system.EligiblePlayers;
 import net.clementraynaud.skoice.system.Network;
-import net.clementraynaud.skoice.lang.MinecraftLang;
 import net.clementraynaud.skoice.util.DistanceUtil;
 import net.clementraynaud.skoice.util.MapUtil;
 import net.clementraynaud.skoice.util.PlayerUtil;
@@ -49,9 +48,11 @@ public class UpdateNetworksTask implements Task {
     private static final ReentrantLock lock = new ReentrantLock();
 
     private final Config config;
+    private final LangFile lang;
 
-    public UpdateNetworksTask(Config config) {
+    public UpdateNetworksTask(Config config, LangFile lang) {
         this.config = config;
+        this.lang = lang;
     }
 
     @Override
@@ -171,7 +172,7 @@ public class UpdateNetworksTask implements Task {
                     .filter(network -> network.contains(player.getUniqueId()))
                     .filter(network -> network.canPlayerStayConnected(player))
                     .filter(network -> !network.canPlayerBeAdded(player))
-                    .forEach(network -> player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(MinecraftLang.ACTION_BAR_ALERT.toString())));
+                    .forEach(network -> player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(this.lang.getMessage("minecraft.action-bar.alert"))));
         } catch (NoSuchMethodError ignored) {
         }
     }
@@ -210,7 +211,7 @@ public class UpdateNetworksTask implements Task {
             if (network.isEmpty()) {
                 VoiceChannel voiceChannel = network.getChannel();
                 if (voiceChannel != null && voiceChannel.getMembers().isEmpty()) {
-                    voiceChannel.delete().reason(DiscordLang.COMMUNICATION_LOST.toString()).queue();
+                    voiceChannel.delete().reason(this.lang.getMessage("discord.communication-lost")).queue();
                     Network.networks.remove(network);
                 }
             }

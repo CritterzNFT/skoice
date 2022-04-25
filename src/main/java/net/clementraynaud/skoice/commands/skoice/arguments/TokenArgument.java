@@ -19,7 +19,6 @@
 
 package net.clementraynaud.skoice.commands.skoice.arguments;
 
-import net.clementraynaud.skoice.lang.MinecraftLang;
 import org.bukkit.command.CommandSender;
 
 public class TokenArgument extends Argument {
@@ -34,11 +33,11 @@ public class TokenArgument extends Argument {
             return;
         }
         if (this.arg.isEmpty()) {
-            this.sender.sendMessage(MinecraftLang.NO_TOKEN.toString());
+            this.sender.sendMessage(super.lang.getMessage("minecraft.chat.configuration.no-token"));
             return;
         }
         if (this.arg.length() != 59 || !this.arg.matches("[a-zA-Z0-9_.]+")) {
-            this.sender.sendMessage(MinecraftLang.INVALID_TOKEN.toString());
+            this.sender.sendMessage(super.lang.getMessage("minecraft.chat.configuration.invalid-token"));
             return;
         }
         super.config.getUpdater().setToken(this.arg);
@@ -49,7 +48,7 @@ public class TokenArgument extends Argument {
                 super.bot.setup(false, this.sender);
             }
         } else {
-            this.sender.sendMessage(MinecraftLang.BOT_ALREADY_CONNECTED.toString());
+            this.sender.sendMessage(super.lang.getMessage("minecraft.chat.configuration.bot-already-connected"));
         }
     }
 }

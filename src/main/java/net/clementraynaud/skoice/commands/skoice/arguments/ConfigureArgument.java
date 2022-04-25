@@ -20,7 +20,6 @@
 package net.clementraynaud.skoice.commands.skoice.arguments;
 
 import net.clementraynaud.skoice.config.ConfigField;
-import net.clementraynaud.skoice.lang.MinecraftLang;
 import net.clementraynaud.skoice.util.MessageUtil;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -43,9 +42,9 @@ public class ConfigureArgument extends Argument {
         Player player = (Player) this.sender;
         if (super.config.getFile().contains(ConfigField.TOKEN.get()) && super.bot.getJda() != null) {
             if (super.bot.isReady()) {
-                player.sendMessage(MinecraftLang.ALREADY_CONFIGURED.toString());
+                player.sendMessage(super.lang.getMessage("minecraft.chat.configuration.already-configured"));
             } else {
-                player.sendMessage(MinecraftLang.INCOMPLETE_CONFIGURATION_OPERATOR_DISCORD.toString());
+                player.sendMessage(super.lang.getMessage("minecraft.chat.configuration.incomplete-configuration-operator-discord"));
             }
         } else {
             try {
@@ -61,7 +60,7 @@ public class ConfigureArgument extends Argument {
                         .append(tokenCommand)
                         .append("§7.\n§8• §7Once done, type \"§e/configure§7\" on your Discord server to go to the next step.\n").event((HoverEvent) null).create());
             } catch (NoSuchMethodError e) {
-                player.sendMessage(MinecraftLang.BOT_CREATION_LINK.toString());
+                player.sendMessage(super.lang.getMessage("minecraft.chat.configuration.bot-creation-link"));
             }
         }
     }

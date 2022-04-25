@@ -23,7 +23,7 @@ import net.clementraynaud.skoice.Skoice;
 import net.clementraynaud.skoice.bot.Bot;
 import net.clementraynaud.skoice.config.Config;
 import net.clementraynaud.skoice.config.ConfigField;
-import net.clementraynaud.skoice.lang.DiscordLang;
+import net.clementraynaud.skoice.lang.LangFile;
 import net.clementraynaud.skoice.listeners.interaction.ButtonClickListener;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.audit.ActionType;
@@ -41,11 +41,13 @@ public class Response {
 
     private final Skoice plugin;
     private final Config config;
+    private final LangFile lang;
     private final Bot bot;
 
-    public Response(Skoice plugin, Config config, Bot bot) {
+    public Response(Skoice plugin, Config config, LangFile lang, Bot bot) {
         this.plugin = plugin;
         this.config = config;
+        this.lang = lang;
         this.bot = bot;
     }
 
@@ -95,9 +97,9 @@ public class Response {
         User user = guild.retrieveAuditLogs().limit(1).type(ActionType.CHANNEL_DELETE).complete().get(0).getUser();
         if (user != null && !user.isBot()) {
             user.openPrivateChannel().complete()
-                    .sendMessageEmbeds(new EmbedBuilder().setTitle(MenuEmoji.GEAR + DiscordLang.CONFIGURATION_EMBED_TITLE.toString())
-                            .addField(MenuEmoji.WARNING + DiscordLang.INCOMPLETE_CONFIGURATION_FIELD_TITLE.toString(),
-                                    DiscordLang.INCOMPLETE_CONFIGURATION_SERVER_MANAGER_FIELD_ALTERNATIVE_DESCRIPTION.toString(), false)
+                    .sendMessageEmbeds(new EmbedBuilder().setTitle(MenuEmoji.GEAR + this.lang.getMessage("discord.menu.configuration.title"))
+                            .addField(MenuEmoji.WARNING + this.lang.getMessage("discord.field.incomplete-configuration.title"),
+                                    this.lang.getMessage("discord.field.incomplete-configuration.server-manager-alternative-description"), false)
                             .setColor(Color.RED).build())
                     .queue(null, new ErrorHandler().ignore(ErrorResponse.CANNOT_SEND_TO_USER));
         }

@@ -20,7 +20,7 @@
 package net.clementraynaud.skoice.listeners.player.eligible;
 
 import net.clementraynaud.skoice.config.Config;
-import net.clementraynaud.skoice.lang.MinecraftLang;
+import net.clementraynaud.skoice.lang.LangFile;
 import net.clementraynaud.skoice.system.EligiblePlayers;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
@@ -34,9 +34,11 @@ import org.bukkit.event.player.PlayerJoinEvent;
 public class PlayerJoinListener implements Listener {
 
     private final Config config;
+    private final LangFile lang;
 
-    public PlayerJoinListener(Config config) {
+    public PlayerJoinListener(Config config, LangFile lang) {
         this.config = config;
+        this.lang = lang;
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -49,7 +51,7 @@ public class PlayerJoinListener implements Listener {
             if (voiceState != null) {
                 VoiceChannel voiceChannel = voiceState.getChannel();
                 if (voiceChannel != null && voiceChannel.equals(this.config.getReader().getLobby())) {
-                    player.sendMessage(MinecraftLang.CONNECTED_TO_PROXIMITY_VOICE_CHAT.toString());
+                    player.sendMessage(this.lang.getMessage("minecraft.chat.player.connected-to-proximity-voice-chat"));
                 }
             }
         }

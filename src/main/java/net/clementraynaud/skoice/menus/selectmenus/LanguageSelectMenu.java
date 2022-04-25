@@ -21,7 +21,6 @@ package net.clementraynaud.skoice.menus.selectmenus;
 
 import net.clementraynaud.skoice.config.ConfigField;
 import net.clementraynaud.skoice.menus.Menu;
-import net.clementraynaud.skoice.lang.DiscordLang;
 import net.clementraynaud.skoice.lang.Lang;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
@@ -42,7 +41,7 @@ public class LanguageSelectMenu extends SelectMenu {
         for (Lang lang : Lang.values()) {
             options.add(SelectOption.of(lang.getFullName(), lang.name())
                     .withDescription(lang.name().equals(Lang.EN.name())
-                            ? DiscordLang.DEFAULT_SELECT_OPTION_DESCRIPTION.toString()
+                            ? super.lang.getMessage("discord.select-option.default.description")
                             : null)
                     .withEmoji(lang.getEmoji()));
         }
@@ -52,7 +51,7 @@ public class LanguageSelectMenu extends SelectMenu {
                     .setDefaultValues(Collections.singleton(super.config.getFile().getString(ConfigField.LANG.get()))).build();
         } else {
             return SelectionMenu.create(Menu.LANGUAGE.name() + "_SELECTION")
-                    .setPlaceholder(DiscordLang.LANGUAGE_SELECT_MENU_PLACEHOLDER.toString())
+                    .setPlaceholder(super.lang.getMessage("discord.menu.language.select-menu.placeholder"))
                     .addOptions(options).build();
         }
     }

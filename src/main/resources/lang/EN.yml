@@ -102,13 +102,13 @@ discord:
         placeholder: "Please select a mode."
         select-option:
           vanilla-mode:
-            title: "Vanilla Mode"
+            label: "Vanilla Mode"
             description: "Horizontal Radius: 80 blocks — Vertical Radius: 40 blocks"
           minigame-mode:
-            title: "Minigame Mode"
+            label: "Minigame Mode"
             description: "Horizontal Radius: 40 blocks — Vertical Radius: 20 blocks"
           customize:
-            title: "Customize"
+            label: "Customize"
             description: "Set distances from 1 to 1000 blocks."
             alternative-description: "Horizontal Radius: %s blocks — Vertical Radius: %s blocks"
     advanced-settings:
@@ -166,6 +166,16 @@ discord:
           description: "Your Discord account is already linked to Minecraft. Type `/unlink` to unlink it."
     error:
       title: "Error"
+      field:
+        access-denied:
+          title: "Access Denied"
+          description: "You do not have the required permission to execute this action."
+        too-many-interactions:
+          title: "Too Many Interactions"
+          description: "You are executing commands too fast."
+        illegal-interaction:
+          title: "Illegal Interaction"
+          description: "You can only interact with the bot on a Discord server."
   field:
     configuration-complete:
       title: "Configuration Complete"
@@ -181,15 +191,6 @@ discord:
     contribute:
       title: "Contribute"
       description: "Interested in helping us shape the future of Skoice? [Contribute on our GitHub page](https://github.com/carlodrift/skoice)!"
-    access-denied:
-      title: "Access Denied"
-      description: "You do not have the required permission to execute this action."
-    too-many-interactions:
-      title: "Too Many Interactions"
-      description: "You are executing commands too fast."
-    illegal-interaction:
-      title: "Illegal Interaction"
-      description: "You can only interact with the bot on a Discord server."
   button-label:
     back: "Back"
     refresh: "Refresh"
@@ -197,13 +198,13 @@ discord:
     configure-later: "Configure Later"
   select-option:
     default:
-      title: "This option is selected by default."
+      description: "This option is selected by default."
     enabled:
-      title: "Enabled"
+      label: "Enabled"
     disabled:
-      title: "Disabled"
+      label: "Disabled"
     too-many-options:
-      title: "Too Many Options"
+      label: "Too Many Options"
       description: "Skoice is unabled to load more options."
   default-category-name: "Proximity Voice Chat"
   default-lobby-name: "Lobby"

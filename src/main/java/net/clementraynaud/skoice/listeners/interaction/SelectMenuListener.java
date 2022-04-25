@@ -24,10 +24,9 @@ import net.clementraynaud.skoice.bot.Bot;
 import net.clementraynaud.skoice.bot.Commands;
 import net.clementraynaud.skoice.config.Config;
 import net.clementraynaud.skoice.config.ConfigField;
-import net.clementraynaud.skoice.menus.ErrorEmbeds;
+import net.clementraynaud.skoice.lang.LangFile;
+import net.clementraynaud.skoice.menus.ErrorEmbed;
 import net.clementraynaud.skoice.menus.Menu;
-import net.clementraynaud.skoice.lang.DiscordLang;
-import net.clementraynaud.skoice.lang.LoggerLang;
 import net.clementraynaud.skoice.menus.Response;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -42,11 +41,13 @@ public class SelectMenuListener extends ListenerAdapter {
 
     private final Skoice plugin;
     private final Config config;
+    private final LangFile lang;
     private final Bot bot;
 
-    public SelectMenuListener(Skoice plugin, Config config, Bot bot) {
+    public SelectMenuListener(Skoice plugin, Config config, LangFile lang, Bot bot) {
         this.plugin = plugin;
         this.config = config;
+        this.lang = lang;
         this.bot = bot;
     }
 
@@ -66,7 +67,7 @@ public class SelectMenuListener extends ListenerAdapter {
                                         && this.bot.getJda().getGuilds().contains(this.bot.getJda().getGuildById(server.getValue()))) {
                                     try {
                                         this.bot.getJda().getGuildById(server.getValue()).leave()
-                                                .queue(success -> event.editMessage(new Response(this.plugin, this.config, this.bot).getMessage()).queue());
+                                                .queue(success -> event.editMessage(new Response(this.plugin, this.config, this.lang, this.bot).getMessage()).queue());
                                     } catch (ErrorResponseException ignored) {
                                     }
                                 }
@@ -77,22 +78,22 @@ public class SelectMenuListener extends ListenerAdapter {
                         this.config.getFile().set(ConfigField.LANG.get(), event.getSelectedOptions().get(0).getValue());
                         this.config.saveFile();
                         this.plugin.updateConfigurationStatus(false);
-                        new Commands(this.plugin, this.bot).register(event.getGuild());
-                        event.editMessage(new Response(this.plugin, this.config, this.bot).getMessage()).queue();
+                        new Commands(this.plugin, this.lang, this.bot).register(event.getGuild());
+                        event.editMessage(new Response(this.plugin, this.config, this.lang, this.bot).getMessage()).queue();
                         break;
                     case "LOBBY_SELECTION":
                         Guild guild = event.getGuild();
                         if (guild != null) {
                             if ("GENERATE" .equals(event.getSelectedOptions().get(0).getValue())) {
-                                String categoryID = guild.createCategory(DiscordLang.DEFAULT_CATEGORY_NAME.toString())
+                                String categoryID = guild.createCategory(this.lang.getMessage("discord.default-category-name"))
                                         .complete().getId();
-                                String lobbyID = guild.createVoiceChannel(DiscordLang.DEFAULT_LOBBY_NAME.toString(), event.getGuild().getCategoryById(categoryID))
+                                String lobbyID = guild.createVoiceChannel(this.lang.getMessage("discord.default-lobby-name"), event.getGuild().getCategoryById(categoryID))
                                         .complete().getId();
                                 this.config.getFile().set(ConfigField.LOBBY_ID.get(), lobbyID);
                                 this.config.saveFile();
                                 this.plugin.updateConfigurationStatus(false);
                             } else if ("REFRESH" .equals(event.getSelectedOptions().get(0).getValue())) {
-                                event.editMessage(new Response(this.plugin, this.config, this.bot).getMessage()).queue();
+                                event.editMessage(new Response(this.plugin, this.config, this.lang, this.bot).getMessage()).queue();
                             } else {
                                 VoiceChannel lobby = guild.getVoiceChannelById(event.getSelectedOptions().get(0).getValue());
                                 if (lobby != null && lobby.getParent() != null) {
@@ -102,7 +103,7 @@ public class SelectMenuListener extends ListenerAdapter {
                                 }
                             }
                         }
-                        event.editMessage(new Response(this.plugin, this.config, this.bot).getMessage()).queue();
+                        event.editMessage(new Response(this.plugin, this.config, this.lang, this.bot).getMessage()).queue();
                         break;
                     case "MODE_SELECTION":
                         if ("VANILLA_MODE" .equals(event.getSelectedOptions().get(0).getValue())) {
@@ -110,13 +111,13 @@ public class SelectMenuListener extends ListenerAdapter {
                             this.config.getFile().set(ConfigField.VERTICAL_RADIUS.get(), 40);
                             this.config.saveFile();
                             this.plugin.updateConfigurationStatus(false);
-                            event.editMessage(new Response(this.plugin, this.config, this.bot).getMessage()).queue();
+                            event.editMessage(new Response(this.plugin, this.config, this.lang, this.bot).getMessage()).queue();
                         } else if ("MINIGAME_MODE" .equals(event.getSelectedOptions().get(0).getValue())) {
                             this.config.getFile().set(ConfigField.HORIZONTAL_RADIUS.get(), 40);
                             this.config.getFile().set(ConfigField.VERTICAL_RADIUS.get(), 20);
                             this.config.saveFile();
                             this.plugin.updateConfigurationStatus(false);
-                            event.editMessage(new Response(this.plugin, this.config, this.bot).getMessage()).queue();
+                            event.editMessage(new Response(this.plugin, this.config, this.lang, this.bot).getMessage()).queue();
                         } else if ("CUSTOMIZE" .equals(event.getSelectedOptions().get(0).getValue())) {
                             Menu.customizeRadius = true;
                             event.editMessage(Menu.MODE.getMessage()).queue();
@@ -129,7 +130,7 @@ public class SelectMenuListener extends ListenerAdapter {
                             this.config.getFile().set(ConfigField.ACTION_BAR_ALERT.get(), false);
                         }
                         this.config.saveFile();
-                        event.editMessage(new Response(this.plugin, this.config, this.bot).getMessage()).queue();
+                        event.editMessage(new Response(this.plugin, this.config, this.lang, this.bot).getMessage()).queue();
                         break;
                     case "CHANNEL_VISIBILITY":
                         if ("true" .equals(event.getSelectedOptions().get(0).getValue())) {
@@ -138,14 +139,14 @@ public class SelectMenuListener extends ListenerAdapter {
                             this.config.getFile().set(ConfigField.CHANNEL_VISIBILITY.get(), false);
                         }
                         this.config.saveFile();
-                        event.editMessage(new Response(this.plugin, this.config, this.bot).getMessage()).queue();
+                        event.editMessage(new Response(this.plugin, this.config, this.lang, this.bot).getMessage()).queue();
                         break;
                     default:
-                        throw new IllegalStateException(String.format(LoggerLang.UNEXPECTED_VALUE.toString(), componentID));
+                        throw new IllegalStateException(this.lang.getMessage("logger.exception.unexpected-value", componentID));
                 }
             }
         } else {
-            event.replyEmbeds(ErrorEmbeds.getAccessDeniedEmbed()).setEphemeral(true).queue();
+            event.replyEmbeds(new ErrorEmbed(this.lang).getAccessDeniedEmbed()).setEphemeral(true).queue();
         }
     }
 }

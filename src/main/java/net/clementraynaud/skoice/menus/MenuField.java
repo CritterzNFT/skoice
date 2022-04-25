@@ -19,7 +19,6 @@
 
 package net.clementraynaud.skoice.menus;
 
-import net.clementraynaud.skoice.lang.DiscordLang;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 public enum MenuField {

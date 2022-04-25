@@ -22,7 +22,6 @@ package net.clementraynaud.skoice.menus.selectmenus;
 import net.clementraynaud.skoice.config.ConfigField;
 import net.clementraynaud.skoice.menus.Menu;
 import net.clementraynaud.skoice.menus.MenuEmoji;
-import net.clementraynaud.skoice.lang.DiscordLang;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
@@ -58,12 +57,12 @@ public class LobbySelectMenu extends SelectMenu {
             }
             optionIndex++;
         }
-        options.add(SelectOption.of(DiscordLang.NEW_VOICE_CHANNEL_SELECT_OPTION_LABEL.toString(), LobbySelectMenu.GENERATE_OPTION_ID)
-                .withDescription(DiscordLang.NEW_VOICE_CHANNEL_SELECT_OPTION_DESCRIPTION.toString())
+        options.add(SelectOption.of(super.lang.getMessage("discord.menu.lobby.select-menu.select-option.new-voice-channel.label"), LobbySelectMenu.GENERATE_OPTION_ID)
+                .withDescription(super.lang.getMessage("discord.menu.lobby.select-menu.select-option.new-voice-channel.description"))
                 .withEmoji(MenuEmoji.HEAVY_PLUS_SIGN.getEmojiFromUnicode()));
         if (options.size() == 23) {
-            options.add(SelectOption.of(DiscordLang.TOO_MANY_OPTIONS_SELECT_OPTION_LABEL.toString(), LobbySelectMenu.REFRESH_OPTION_ID)
-                    .withDescription(DiscordLang.TOO_MANY_OPTIONS_SELECT_OPTION_DESCRIPTION.toString())
+            options.add(SelectOption.of(super.lang.getMessage("discord.select-option.too-many-options.label"), LobbySelectMenu.REFRESH_OPTION_ID)
+                    .withDescription(super.lang.getMessage("discord.select-option.too-many-options.description"))
                     .withEmoji(MenuEmoji.WARNING.getEmojiFromUnicode()));
         }
         if (super.bot.isReady()) {
@@ -72,7 +71,7 @@ public class LobbySelectMenu extends SelectMenu {
                     .setDefaultValues(Collections.singleton(super.config.getFile().getString(ConfigField.LOBBY_ID.get()))).build();
         } else {
             return SelectionMenu.create(Menu.LOBBY.name() + "_SELECTION")
-                    .setPlaceholder(DiscordLang.LOBBY_SELECT_MENU_PLACEHOLDER.toString())
+                    .setPlaceholder(super.lang.getMessage("discord.menu.lobby.select-menu.placeholder"))
                     .addOptions(options).build();
         }
     }

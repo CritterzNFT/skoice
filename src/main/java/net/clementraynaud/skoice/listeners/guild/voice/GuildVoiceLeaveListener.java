@@ -21,7 +21,7 @@
 package net.clementraynaud.skoice.listeners.guild.voice;
 
 import net.clementraynaud.skoice.config.Config;
-import net.clementraynaud.skoice.lang.MinecraftLang;
+import net.clementraynaud.skoice.lang.LangFile;
 import net.clementraynaud.skoice.system.Network;
 import net.clementraynaud.skoice.util.MapUtil;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
@@ -34,9 +34,11 @@ import java.util.UUID;
 public class GuildVoiceLeaveListener extends ListenerAdapter {
 
     private final Config config;
+    private final LangFile lang;
 
-    public GuildVoiceLeaveListener(Config config) {
+    public GuildVoiceLeaveListener(Config config, LangFile lang) {
         this.config = config;
+        this.lang = lang;
     }
 
     @Override
@@ -56,7 +58,7 @@ public class GuildVoiceLeaveListener extends ListenerAdapter {
                     .forEach(network -> network.remove(player.getPlayer()));
             if (event.getChannelLeft().equals(this.config.getReader().getLobby())
                     || Network.networks.stream().anyMatch(network -> network.getChannel().equals(event.getChannelLeft()))) {
-                player.getPlayer().sendMessage(MinecraftLang.DISCONNECTED_FROM_PROXIMITY_VOICE_CHAT.toString());
+                player.getPlayer().sendMessage(this.lang.getMessage("minecraft.chat.player.disconnected-from-proximity-voice-chat"));
             }
         }
     }

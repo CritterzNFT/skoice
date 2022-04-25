@@ -21,7 +21,6 @@ package net.clementraynaud.skoice.menus.selectmenus;
 
 import net.clementraynaud.skoice.menus.Menu;
 import net.clementraynaud.skoice.menus.MenuEmoji;
-import net.clementraynaud.skoice.lang.DiscordLang;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
@@ -46,12 +45,12 @@ public class ServerSelectMenu extends SelectMenu {
             optionIndex++;
         }
         if (options.size() == 24) {
-            options.add(SelectOption.of(DiscordLang.TOO_MANY_OPTIONS_SELECT_OPTION_LABEL.toString(), "refresh")
-                    .withDescription(DiscordLang.TOO_MANY_OPTIONS_SELECT_OPTION_DESCRIPTION.toString())
+            options.add(SelectOption.of(super.lang.getMessage("discord.select-option.too-many-options.label"), "refresh")
+                    .withDescription(super.lang.getMessage("discord.select-option.too-many-options.description"))
                     .withEmoji(MenuEmoji.WARNING.getEmojiFromUnicode()));
         }
         return SelectionMenu.create(Menu.SERVER.name() + "_SELECTION")
-                .setPlaceholder(DiscordLang.SERVER_SELECT_MENU_PLACEHOLDER.toString())
+                .setPlaceholder(super.lang.getMessage("discord.menu.server.select-menu.placeholder"))
                 .addOptions(options).build();
     }
 }
